@@ -89,7 +89,7 @@ export default defineComponent({
     top: 20px;
     transform: translateX(-50%);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    box-shadow: 0px 0px 10px 2px $shadow;
+    box-shadow: 0px 5px 10px 1px $shadow;
     border-radius: 20px;
 }
 

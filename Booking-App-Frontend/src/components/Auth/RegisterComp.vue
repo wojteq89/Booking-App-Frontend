@@ -24,6 +24,7 @@
   <script setup>
   import { reactive } from 'vue'
   import { useAuthStore } from '@/stores/auth'
+  import router from '../../router'
 
   const auth = useAuthStore()
   
@@ -40,6 +41,7 @@
     try {
       await auth.register(form)
       alert('Rejestracja zakończona!')
+      router.push('/login');
     } catch (err) {
       alert('Błąd: ' + JSON.stringify(err))
     }
