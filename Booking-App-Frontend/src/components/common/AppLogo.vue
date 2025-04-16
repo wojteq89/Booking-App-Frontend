@@ -18,7 +18,6 @@
     align-items: center;
     height: auto;
     position: relative;
-    background-color: white;
     border: 0px solid transparent;
     border-radius: 20px;
 }
@@ -43,7 +42,6 @@
     }
     .callendar-icon {
         animation: slideInCallendarMobile 1.5s ease-out forwards;
-        width: 80%;
     }
     .inscription {
         animation: slideInInscriptionMobile 2s ease-out forwards;

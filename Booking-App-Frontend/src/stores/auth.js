@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import axiosPreset from '../axiosPreset';
+import router from '../router';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -51,6 +52,7 @@ export const useAuthStore = defineStore('auth', {
 
         if (res.status === 401) {
           this.logout();
+          router.push('/');
           alert('Your session has expired. Please log in again.');
         }
 

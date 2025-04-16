@@ -1,15 +1,43 @@
-
-
 <template>
-  <div class="router-view-container">
+<NavBar />
+<div class="router-view-container">
     <router-view v-slot="{ Component }">
-      <Transition name="slide" mode="out-in">
-        <component :is="Component" />
-      </Transition>
+        <Transition name="slide" mode="out-in">
+            <component :is="Component" />
+        </Transition>
     </router-view>
-  </div>
+</div>
 </template>
 
+<script>
+import {
+    useAuthStore
+} from '@/stores/auth'
+import {
+    defineComponent,
+    onMounted
+} from 'vue'
+import NavBar from './components/common/NavBar.vue';
+
+export default defineComponent({
+    components: {
+        NavBar
+    },
+    setup() {
+        const authStore = useAuthStore()
+
+        onMounted(() => {
+            if (authStore.token) {
+                authStore.checkTokenExpiry()
+            }
+        })
+
+        return {
+            authStore,
+        }
+    },
+})
+</script>
 
 <style lang="scss">
 body {
@@ -19,12 +47,12 @@ body {
 }
 
 #app {
-  margin: 0 auto;
-  padding: 0;
+    margin: 0 auto;
+    padding: 0;
 }
 
 .router-view-container {
-    margin: 0 auto;
+    margin-top: 60px;
     background-color: $white;
     animation: slideInView 1s ease-out forwards;
 }
@@ -47,27 +75,28 @@ body {
     }
 }
 
-.slide-enter-active, .slide-leave-active {
-  transition: all 1s ease;
+.slide-enter-active,
+.slide-leave-active {
+    transition: all 1s ease;
 }
 
 .slide-enter-from {
-  opacity: 0;
-  transform: translateX(-100%);
+    opacity: 0;
+    transform: translateX(-100%);
 }
 
 .slide-enter-to {
-  opacity: 1;
-  transform: translateX(0);
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .slide-leave-from {
-  opacity: 1;
-  transform: translateX(0);
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .slide-leave-to {
-  opacity: 0;
-  transform: translateX(100%);
+    opacity: 0;
+    transform: translateX(100%);
 }
 </style>
