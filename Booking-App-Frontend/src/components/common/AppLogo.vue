@@ -1,8 +1,8 @@
 <template>
     <div class="main">
-        <img class="callendar-icon" src="C:\Users\wojte\Desktop\abns\Praca inżynierska\Booking-App-Frontend\Booking-App-Frontend\src\assets\Graphics\logo_callendar_TermiNow.svg" alt="logo">
+        <img class="callendar-icon" src="../../assets/Graphics/logo_callendar_TermiNow.svg" alt="logo">
         <div class="inscription-container">
-            <img class="inscription" src="C:\Users\wojte\Desktop\abns\Praca inżynierska\Booking-App-Frontend\Booking-App-Frontend\src\assets\Graphics\logo_inscription_TermiNow.svg" alt="logo">
+            <img class="inscription" src="../../assets/Graphics/logo_inscription_TermiNow.svg" alt="logo">
         </div>
     </div>
 </template>
@@ -26,11 +26,9 @@
 .callendar-icon {
     z-index: 2;
     position: relative;
-    animation: slideInCallendar 1.5s ease-out forwards;
 }
 
 .inscription {
-    animation: slideInInscription 1.5s ease-out forwards;
     z-index: 1;
 
 }
@@ -39,9 +37,25 @@
     overflow: hidden;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .main {
         flex-direction: column;
+    }
+    .callendar-icon {
+        animation: slideInCallendarMobile 1.5s ease-out forwards;
+        width: 80%;
+    }
+    .inscription {
+        animation: slideInInscriptionMobile 2s ease-out forwards;
+    }
+}
+
+@media screen and (width > 768px) {
+    .callendar-icon {
+        animation: slideInCallendar 1.5s ease-out forwards;
+    }
+    .inscription {
+        animation: slideInInscription 1.5s ease-out forwards;
     }
     
 }
@@ -58,6 +72,18 @@
     }
     100% {
         transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInInscriptionMobile {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
         opacity: 1;
     }
 }
@@ -83,4 +109,27 @@
     }
 }
 
+@keyframes slideInCallendarMobile {
+    0% {
+        transform: translateY(-30%);
+    }
+    10% {
+        transform: translateY(0);
+    }
+    20% {
+        transform: translateY(10%);
+    }
+    30% {
+        transform: translateY(-10%);
+    }
+    40% {
+        transform: translateY(-20%);
+    }
+    50% {
+        transform: translateY(-20%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
 </style>

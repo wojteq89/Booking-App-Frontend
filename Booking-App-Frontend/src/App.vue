@@ -18,6 +18,11 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+#app {
+  margin: 0 auto;
+  padding: 0;
+}
+
 .router-view-container {
     margin: 0 auto;
     background-color: $white;

@@ -4,6 +4,7 @@ import piniaPersist from 'pinia-plugin-persistedstate' // Importowanie wtyczki
 import './style.css'
 import App from './App.vue'
 import router from './router'
+import AppLogo from '@/components/common/AppLogo.vue'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -12,4 +13,5 @@ pinia.use(piniaPersist)
 app.use(pinia)
 app.use(router)
 
+app.component('AppLogo', AppLogo)
 app.mount('#app')

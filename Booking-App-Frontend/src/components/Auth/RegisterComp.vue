@@ -1,27 +1,30 @@
 <template>
   <div>
-    <form @submit.prevent="submitForm">
-      <input v-model="form.first_name" placeholder="First Name" />
-      <input v-model="form.second_name" placeholder="Second Name" />
-      <input v-model="form.email" placeholder="Email" />
-      <input v-model="form.password" type="password" placeholder="Password" />
-      <input v-model="form.city" placeholder="City" />
-      <input v-model="form.phone_number" placeholder="Phone Number" />
-      <select v-model="form.role">
-        <option value="user">User</option>
-        <option value="owner">Owner</option>
-        <option value="admin">Admin</option>
-      </select>
-      <button type="submit">Register</button>
-    </form>
-    <router-link to="/login">Masz już konto? Zaloguj się</router-link>
+    <div class="login-container" v-if="!auth.user">
+      <AppLogo class="app-logo" />
+      <h2 class="title">Zarejestruj się</h2>
+      <form @submit.prevent="submitForm" class="login-form">
+        <input class="input-field" v-model="form.first_name" placeholder="First Name" />
+        <input class="input-field" v-model="form.second_name" placeholder="Second Name" />
+        <input class="input-field" v-model="form.email" placeholder="Email" />
+        <input class="input-field" v-model="form.password" type="password" placeholder="Password" />
+        <input class="input-field" v-model="form.city" placeholder="City" />
+        <input class="input-field" v-model="form.phone_number" placeholder="Phone Number" />
+        <button type="submit" class="submit-button">Register</button>
+      </form>
+      <router-link to="/login">Masz już konto? Zaloguj się</router-link>
+    </div>
+    <div v-else="auth.user">
+        <p>Zalogowano jako:  {{ auth.user ? auth.user.first_name : 'User' }}</p>
+        <button class="submit-button" @click="auth.logout()">Wyloguj</button>
+    </div>
   </div>
-  </template>
+</template>
   
   <script setup>
   import { reactive } from 'vue'
   import { useAuthStore } from '@/stores/auth'
-  
+
   const auth = useAuthStore()
   
   const form = reactive({
@@ -29,7 +32,6 @@
     second_name: '',
     email: '',
     password: '',
-    role: 'user',
     city: '',
     phone_number: '',
   })
@@ -44,3 +46,6 @@
   }
   </script>
   
+<style lang="scss" scoped>
+    @use "@/styles/authComponents.scss" as *;
+</style>
