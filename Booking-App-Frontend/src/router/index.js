@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginComp from '@/components/Auth/LoginComp.vue'
-import RegisterComp from '@/components/Auth/RegisterComp.vue'
+import LoginComp from '@/components/auth/LoginComp.vue'
+import RegisterComp from '@/components/auth/RegisterComp.vue'
 import MainComp from '@/components/MainComp.vue'
 
 const routes = [

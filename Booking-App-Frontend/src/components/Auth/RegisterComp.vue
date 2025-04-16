@@ -1,4 +1,5 @@
 <template>
+  <div>
     <form @submit.prevent="submitForm">
       <input v-model="form.first_name" placeholder="First Name" />
       <input v-model="form.second_name" placeholder="Second Name" />
@@ -14,6 +15,7 @@
       <button type="submit">Register</button>
     </form>
     <router-link to="/login">Masz już konto? Zaloguj się</router-link>
+  </div>
   </template>
   
   <script setup>
