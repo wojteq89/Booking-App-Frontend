@@ -5,11 +5,13 @@
       <h1>Witaj, {{ user ? user.first_name : 'User' }}</h1>
       <div class="button-container">
         <button class="func-button" @click="goToHomePage()">Przeglądaj</button>
+        <button class="func-button" @click="goToBusinessForm()">Dodaj swój biznes</button> <!-- vif jak bedzie mial biznes czyli role=user -->
+        <!-- tu przycisk serwisy? role=owner -->
         <button class="func-button" @click="handleLogout()">Wyloguj</button>
       </div>
     </div>
     <div v-else>
-      <h1>Zostałeś wylogowany</h1>
+      <h1>Zaloguj się ponownie</h1>
       <div class="button-container">
         <button class="func-button" @click="goToLogin()">Zaloguj się ponownie</button>
         <button class="func-button" @click="goToHomePage()">Przeglądaj</button>
@@ -18,43 +20,32 @@
   </div>
 </template>
 
-  
-<script>
-import { useAuthStore } from '@/stores/auth'
-import { defineComponent } from 'vue'
-import { storeToRefs } from 'pinia'
-import router from '../router'
+<script setup>
+  import { useAuthStore } from '@/stores/auth'
+  import { storeToRefs } from 'pinia'
+  import router from '@/router'
 
-export default defineComponent({
-  setup() {
-    const authStore = useAuthStore()
-    const { isLoggedIn, user } = storeToRefs(authStore)
+  const authStore = useAuthStore()
+  const { isLoggedIn, user } = storeToRefs(authStore)
 
-    const handleLogout = () => {
-      authStore.logout()
-    }
+  const handleLogout = () => {
+    authStore.logout()
+  }
 
-    function goToLogin() {
-      router.push('/login')
-    }
+  const goToLogin = () => {
+    router.push('/login')
+  }
 
-    function goToHomePage() {
-      router.push('/home')
-    }
+  const goToHomePage = () => {
+    router.push('/home')
+  }
 
-    return {
-      isLoggedIn,
-      user,
-      handleLogout,
-      goToLogin,
-      goToHomePage,
-    }
-  },
-})
+  const goToBusinessForm = () => {
+    router.push('/add-business-form')
+  }
 </script>
 
 <style lang="scss" scoped>
-
 .main-container {
   display: flex;
   justify-content: center;

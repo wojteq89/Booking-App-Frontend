@@ -1,6 +1,6 @@
 @use './_colors' as *;
 
-.login-container {
+.container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -14,7 +14,7 @@
     margin-bottom: 20px;
 }
 
-.login-form {
+.custom-form {
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -54,7 +54,7 @@
     color: $primary;
 }
 
-.submit-button {
+.custom-button {
     background-color: transparent;
     color: $primary;
     border: 2px solid $primary;
@@ -63,7 +63,7 @@
     
 }
 
-.submit-button:hover {
+.custom-button:hover {
     background-color: $primary;
     color: $white;
 }
@@ -74,7 +74,7 @@
 }
 
 @media screen and (max-width: 950px) {
-    .login-container {
+    .container {
         width: 90vw;
         box-shadow: none;
     }
@@ -87,7 +87,7 @@
         font-size: medium;
     }
 
-    .submit-button {
+    .custom-button {
         font-size: medium;
     }
     

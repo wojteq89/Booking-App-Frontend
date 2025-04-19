@@ -1,7 +1,8 @@
 <template>
 <div :class="['navbar', { 'scrolled': isScrolled }]">
     <AppLogo class="app-logo" />
-    <button class="profile-button" @click="goToLogin()">{{ user ? user.first_name : 'Zaloguj się' }}</button>
+    <button v-if="!isLoggedIn" class="profile-button" @click="goToLogin()">Zaloguj się</button>
+    <button v-if="isLoggedIn" class="profile-button" @click="goToSettingsPage()">{{ user.first_name }}</button>
 </div>
 </template>
 
@@ -25,7 +26,8 @@ export default defineComponent({
         const authStore = useAuthStore()
         const isScrolled = ref(false)
         const {
-            user
+            user,
+            isLoggedIn
         } = storeToRefs(authStore)
 
         const handleScroll = () => {
@@ -40,8 +42,8 @@ export default defineComponent({
             router.push('/login')
         }
 
-        function goToHomePage() {
-            router.push('/home')
+        function goToSettingsPage() {
+            router.push('/settings')
         }
 
         onBeforeUnmount(() => {
@@ -53,12 +55,12 @@ export default defineComponent({
         })
 
         return {
-            isLoggedIn: authStore.isLoggedIn,
+            isLoggedIn,
             authStore,
             user,
             handleLogout,
             goToLogin,
-            goToHomePage,
+            goToSettingsPage,
             isScrolled,
         }
     },

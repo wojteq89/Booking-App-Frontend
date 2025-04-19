@@ -33,7 +33,7 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('isLogged', this.isLoggedIn);
         await this.getUser();
         showAlert({ icon: 'success', title: 'Zalogowano pomyślnie!',})
-        router.push('/');
+        router.push('/settings');
       } catch (err) {
         console.error('Login error:', err);
         showAlert({ icon: 'error', title: 'Nie udało się zalogować',})
@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
 
         if (res.status === 401) {
           this.logout();
-          router.push('/');
+          router.push('/settings');
           alert('Your session has expired. Please log in again.');
         }
 
