@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import axiosPreset from '../axiosPreset';
 import router from '../router';
+import Swal from 'sweetalert2'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -13,8 +14,11 @@ export const useAuthStore = defineStore('auth', {
     async register(formData) {
       try {
         const res = await axiosPreset.post('/register', formData);
+        showAlert({ icon: 'success', title: 'Zarejestrowano pomyślnie!',})
+        router.push('/login');
         return res.data;
       } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się zarejestrować',})
         throw err.response.data;
       }
     },
@@ -27,10 +31,12 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('token', this.token);
         this.isLoggedIn = true;
         localStorage.setItem('isLogged', this.isLoggedIn);
-
         await this.getUser();
+        showAlert({ icon: 'success', title: 'Zalogowano pomyślnie!',})
+        router.push('/');
       } catch (err) {
         console.error('Login error:', err);
+        showAlert({ icon: 'error', title: 'Nie udało się zalogować',})
         this.logout();
         throw err;
       }
@@ -72,6 +78,22 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('userData');
       localStorage.removeItem('isLogged');
       delete axiosPreset.defaults.headers.common['Authorization'];
+      showAlert({ icon: 'success', title: 'Wylogowano pomyślnie!',})
+      router.push('/login')
     },
   },
 });
+
+export const showAlert = ({ icon = 'info', title = ''}) => {
+  Swal.fire({
+    icon,
+    title,
+    text: "",
+    timer: 2000,
+    toast: false,
+    showConfirmButton: false,
+    timerProgressBar: true,
+    background: '#414e66',
+    color: '#fff',
+  })
+}

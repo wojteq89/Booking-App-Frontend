@@ -25,19 +25,13 @@ import {
 import {
     useAuthStore
 } from '@/stores/auth'
-import router from '../../router'
 
 const auth = useAuthStore()
 const email = ref('')
 const password = ref('')
 
 const handleLogin = async () => {
-    try {
-        await auth.login(email.value, password.value)
-        router.push('/')
-    } catch (err) {
-        alert('Niepoprawne dane logowania')
-    }
+    await auth.login(email.value, password.value)
 }
 </script>
 

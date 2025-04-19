@@ -34,7 +34,6 @@ export default defineComponent({
 
         const handleLogout = () => {
             authStore.logout()
-            router.push('/login')
         }
 
         function goToLogin() {
