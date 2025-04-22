@@ -1,50 +1,93 @@
 <template>
-    <div class="main">
-      <section class="first-column">
-        <div class="photo-container"></div>
-  
-        <div class="title-container">
-          <h1 class="bussines-name">Title</h1>
-          <button class="fav-button custom-button">Favorites</button>
-        </div>
-  
-        <p class="localization">Międzyrzec Podlaski</p>
-  
-        <section class="services">
-          <h2>Usługi</h2>
-          <div class="service-item" v-for="i in 10" :key="i">
-            <h3 class="">Strzyżenie włosów</h3>
-            <div class="service-buy">
-              <h3 class="service-price">30zł</h3>
-              <button class="service-buy-button custom-button">Umów</button>
-            </div>
+  <div class="main" v-if="service">
+    <section class="first-column">
+      <div class="photo-container" :style="backgroundImageStyle"></div>
+
+      <div class="title-container">
+        <h1 class="bussines-name">{{ service.name }}</h1>
+        <button class="fav-button custom-button">❤️</button>
+      </div>
+
+      <p class="localization">{{ service.location }}</p>
+
+      <section class="services">
+        <h2>Usługi</h2>
+        <!-- To można zastąpić dynamiczną listą usług w przyszłości -->
+        <div class="service-item" v-for="i in 3" :key="i">
+          <h3>Strzyżenie włosów</h3>
+          <div class="service-buy">
+            <h3 class="service-price">30zł</h3>
+            <h3 class="service-time">30min</h3>
           </div>
-        </section>
-  
-        <section class="reviews">
-          <!-- Recenzje -->
-        </section>
-      </section>
-  
-      <section class="second-column">
-        <section>Adres(mapa)</section>
-        <section>Godziny otwarcia</section>
-        <section>Dane kontaktowe</section>
-        <section>Jakies info</section>
-        <section>
-          FOR OWNER ONLY
-          button delete
-          button edit
-        </section>
+          <button class="service-buy-button custom-button">Umów</button>
+        </div>
       </section>
 
-    </div>
-  </template>
+      <section class="reviews">
+        <!-- Opinie -->
+      </section>
+    </section>
+
+    <section class="second-column">
+      <section><strong>Adres:</strong> {{ service.location }}</section>
+      <section><strong>Godziny otwarcia:</strong> {{ service.opening_hours || 'Brak danych' }}</section>
+      <section><strong>Opis:</strong> {{ service.description || 'Brak opisu' }}</section>
+      <section><strong>Kategoria:</strong> {{ service.category }}</section>
+
+      <section v-if="isOwner" class="owner-panel">
+        <strong>Panel właściciela:</strong>
+        <button class="custom-button">Edytuj</button>
+        <button class="custom-button delete-button" @click="deleteService" >Usuń</button>
+      </section>
+    </section>
+  </div>
+
+  <div v-else>
+    <AppLogo class="app-logo" />
+  </div>
+</template>
+
   
 
 <script setup>
+  import { onMounted, ref, computed } from 'vue';
+  import { useAuthStore } from '@/stores/auth';
+  import { useBusinessStore } from '@/stores/business';
+  import { storeToRefs } from 'pinia';
+  import App from '../../App.vue';
 
+  const businessStore = useBusinessStore();
+  const authStore = useAuthStore();
+  const { myService: service } = storeToRefs(businessStore);
+  
+  const isOwner = ref(false);
+
+  onMounted(async () => {
+    try {
+      await businessStore.fetchMyService();
+      checkIsOwner();
+    } catch (err) {
+      console.error('Błąd podczas ładowania usługi:', err);
+    }
+  });
+
+  const deleteService = async () => {
+    try {
+      await businessStore.deleteMyService();
+    } catch (err) {
+      console.error('Błąd podczas usuwania usługi:', err);
+    }
+  };
+
+  const checkIsOwner = () => {
+    try {
+      isOwner.value = authStore.user.id === businessStore.myService.user_id;
+    } catch (err) {
+      console.error('Błąd podczas sprawdzania właściciela:', err);
+    }
+  };
 </script>
+
 
 <style lang="scss" scoped>
     @use "@/styles/commonStyles.scss" as *;
@@ -52,7 +95,7 @@
         display: flex;
         justify-content: center;
         flex-direction: row;
-        width: 100vw;
+        width: 90vw;
         padding: 20px;
         position: relative;
         border-radius: 20px;
@@ -72,7 +115,7 @@
 
     .photo-container {
         width: 100%;
-        height: 500px;
+        height: 400px;
         background-image: url('@/assets/Graphics/logo_callendar_TermiNow.svg');
         background-size: contain;
         background-repeat: no-repeat;
@@ -134,7 +177,7 @@
     }
 
     .service-buy-button {
-
+      margin-left: 20px;
     }
 
     .second-column {
@@ -144,5 +187,10 @@
         flex-direction: column;
         padding-left: 20px;
         gap: 100px;
+    }
+
+    .owner-panel {
+        display: flex;
+        flex-direction: column;
     }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container" v-if="!auth.user">
+    <div class="container" v-if="!authStore.user">
       <AppLogo class="app-logo" />
       <h2 class="title">Zarejestruj się</h2>
       <form @submit.prevent="submitForm" class="custom-form">
@@ -14,9 +14,9 @@
       </form>
       <router-link to="/login">Masz już konto? Zaloguj się</router-link>
     </div>
-    <div v-else="auth.user">
-        <p>Zalogowano jako:  {{ auth.user ? auth.user.first_name : 'User' }}</p>
-        <button class="custom-button" @click="auth.logout()">Wyloguj</button>
+    <div v-else="authStore.user">
+        <p>Zalogowano jako:  {{ authStore.user ? authStore.user.first_name : 'User' }}</p>
+        <button class="custom-button" @click="authStore.logout()">Wyloguj</button>
     </div>
   </div>
 </template>
@@ -25,7 +25,7 @@
   import { reactive } from 'vue'
   import { useAuthStore } from '@/stores/auth'
 
-  const auth = useAuthStore()
+  const authStore = useAuthStore()
   
   const form = reactive({
     first_name: '',
@@ -37,7 +37,7 @@
   })
   
   const submitForm = async () => {
-      await auth.register(form)
+      await authStore.register(form)
   }
   </script>
   

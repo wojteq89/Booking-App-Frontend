@@ -29,6 +29,7 @@ export default defineComponent({
         onMounted(() => {
             if (authStore.token) {
                 authStore.checkTokenExpiry()
+                authStore.getUser()
             }
         })
 

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="container" v-if="auth.user.role == 'user'">
+        <div class="container" v-if="authStore.user.role == 'user'">
             <AppLogo class="app-logo" />
             <h2 class="title">Dodaj swój biznes</h2>
             <form @submit.prevent="registerBusiness" class="custom-form">
@@ -12,9 +12,9 @@
                 <button class="custom-button" type="submit">Dodaj biznes</button>
             </form>
         </div>
-        <div v-if="auth.user.role == 'owner'">
-            <p>Zalogowano jako:  {{ auth.user ? auth.user.first_name : 'User' }}</p>
-            <button class="custom-button" @click="auth.logout()">Wyloguj</button>
+        <div v-if="authStore.user.role == 'owner'">
+            <p>Zalogowano jako:  {{ authStore.user ? authStore.user.first_name : 'User' }}</p>
+            <button class="custom-button" @click="authStore.logout()">Wyloguj</button>
         </div>
     </div>
 </template>
@@ -31,7 +31,7 @@ import {
     useBusinessStore
 } from '@/stores/business'
 
-const auth = useAuthStore()
+const authStore = useAuthStore()
 const business = useBusinessStore()
 
 const form = reactive({

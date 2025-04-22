@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="container" v-if="!auth.isLoggedIn">
+        <div class="container" v-if="!authStore.isLoggedIn">
             <AppLogo class="app-logo" />
             <h2 class="title">Zaloguj się</h2>
             <form @submit.prevent="handleLogin" class="custom-form">
@@ -10,9 +10,9 @@
             </form>
             <router-link to="/register">Nie masz konta? Zarejestruj się</router-link>
         </div>
-        <div v-if="auth.isLoggedIn">
-            <p>Zalogowano jako:  {{ auth.user ? auth.user.first_name : 'User' }}</p>
-            <button class="custom-button" @click="auth.logout()">Wyloguj</button>
+        <div v-if="authStore.isLoggedIn">
+            <p>Zalogowano jako:  {{ authStore.user ? authStore.user.first_name : 'User' }}</p>
+            <button class="custom-button" @click="authStore.logout()">Wyloguj</button>
         </div>
     </div>
 </template>
@@ -26,12 +26,12 @@ import {
     useAuthStore
 } from '@/stores/auth'
 
-const auth = useAuthStore()
+const authStore = useAuthStore()
 const email = ref('')
 const password = ref('')
 
 const handleLogin = async () => {
-    await auth.login(email.value, password.value)
+    await authStore.login(email.value, password.value)
 }
 </script>
 
