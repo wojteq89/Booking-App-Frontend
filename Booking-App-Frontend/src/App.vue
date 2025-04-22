@@ -55,6 +55,9 @@ body {
     margin-top: 60px;
     background-color: $white;
     animation: slideInView 1s ease-out forwards;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Animations */

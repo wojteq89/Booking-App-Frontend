@@ -5,8 +5,8 @@
       <h1>Witaj, {{ user ? user.first_name : 'User' }}</h1>
       <div class="button-container">
         <button class="func-button" @click="goToHomePage()">Przeglądaj</button>
-        <button class="func-button" @click="goToBusinessForm()">Dodaj swój biznes</button> <!-- vif jak bedzie mial biznes czyli role=user -->
-        <!-- tu przycisk serwisy? role=owner -->
+        <button v-if="auth.user.role == 'user'" class="func-button" @click="goToBusinessForm()">Dodaj swój biznes</button>
+        <button v-if="auth.user.role == 'owner'" class="func-button" @click="goToMyBusiness()">Edytuj swój biznes</button>
         <button class="func-button" @click="handleLogout()">Wyloguj</button>
       </div>
     </div>
@@ -25,11 +25,11 @@
   import { storeToRefs } from 'pinia'
   import router from '@/router'
 
-  const authStore = useAuthStore()
-  const { isLoggedIn, user } = storeToRefs(authStore)
+  const auth = useAuthStore()
+  const { isLoggedIn, user } = storeToRefs(auth)
 
   const handleLogout = () => {
-    authStore.logout()
+    auth.logout()
   }
 
   const goToLogin = () => {
@@ -42,6 +42,10 @@
 
   const goToBusinessForm = () => {
     router.push('/add-business-form')
+  }
+
+  const goToMyBusiness = () => {
+    router.push('/my-business')
   }
 </script>
 

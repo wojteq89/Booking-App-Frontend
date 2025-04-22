@@ -1,17 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginComp from '@/components/auth/LoginComp.vue'
-import RegisterComp from '@/components/auth/RegisterComp.vue'
+import LoginPage from '@/components/auth/LoginPage.vue'
+import RegisterPage from '@/components/auth/RegisterPage.vue'
 import SettingsComp from '@/components/settings/SettingsComp.vue'
-import HomeComp from '@/components/homePage/HomePage.vue'
+import HomePage from '@/components/homePage/HomePage.vue'
 import AddBusinessForm from '@/components/forms/AddBusinessForm.vue'
+import BussinesDetailsPage from '@/components/bussines/BussinesDetailsPage.vue'
 
 const routes = [
   { path: '/settings', component: SettingsComp },
-  { path: '/login', component: LoginComp },
-  { path: '/register', component: RegisterComp },
-  { path: '/home', component: HomeComp },
+  { path: '/login', component: LoginPage },
+  { path: '/register', component: RegisterPage },
+  { path: '/home', component: HomePage },
   { path: '/add-business-form', component: AddBusinessForm },
-
+  { path: '/my-business', component: BussinesDetailsPage },
 ]
 
 const router = createRouter({
