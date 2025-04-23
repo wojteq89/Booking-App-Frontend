@@ -85,7 +85,7 @@ export default defineComponent({
 }
 
 .navbar.scrolled {
-    width: 80%;
+    width: 95%;
     left: 50%;
     top: 20px;
     transform: translateX(-50%);

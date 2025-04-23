@@ -1,15 +1,12 @@
 <template>
   <div class="main" v-if="service">
     <section class="first-column">
-      <div class="photo-container" :style="backgroundImageStyle"></div>
+      <div class="photo-container"></div>
 
       <div class="title-container">
         <h1 class="bussines-name">{{ service.name }}</h1>
         <button class="fav-button custom-button">❤️</button>
       </div>
-
-      <p class="localization">{{ service.location }}</p>
-
       <section class="services">
         <h2>Usługi</h2>
         <!-- To można zastąpić dynamiczną listą usług w przyszłości -->
@@ -29,10 +26,45 @@
     </section>
 
     <section class="second-column">
-      <section><strong>Adres:</strong> {{ service.location }}</section>
-      <section><strong>Godziny otwarcia:</strong> {{ service.opening_hours || 'Brak danych' }}</section>
-      <section><strong>Opis:</strong> {{ service.description || 'Brak opisu' }}</section>
-      <section><strong>Kategoria:</strong> {{ service.category }}</section>
+
+      <section class="map-container">
+        <iframe class="map-iframe"
+          v-if="service.location"
+          :src="mapUrl"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </section>
+      <div class="address">
+        <strong>Adres:</strong>
+        <p>{{ service.location }}</p>  
+      </div>
+
+      <strong>Godziny otwarcia:</strong>
+      <div class="open-hours">
+        <div>
+          <p class="week-day" v-for="(day, index) in ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']" :key="index">
+            {{ day }}
+          </p>
+        </div>
+        <div class="day-hours" v-if="service.opening_hours">
+            <p class="day-hours" v-for="(line, i) in service.opening_hours.split('\n')" :key="i">
+              {{ line }}<br />
+            </p>
+        </div>
+        <div v-else>Brak danych</div>
+      </div>
+
+      <div class="description">
+        <strong>Opis:</strong>
+        <p>{{ service.description || 'Brak opisu' }}</p>
+      </div>
+      
+      <div class="category">
+        <strong>Kategoria:</strong>
+        <p>{{ service.category }}</p>
+      </div>
 
       <section v-if="isOwner" class="owner-panel">
         <strong>Panel właściciela:</strong>
@@ -86,6 +118,11 @@
       console.error('Błąd podczas sprawdzania właściciela:', err);
     }
   };
+
+  const mapUrl = computed(() => {
+    const query = encodeURIComponent(service.value.location || '');
+    return `https://www.google.com/maps/embed/v1/place?key=AIzaSyAKVGoLBVhgqkyjYTSOW55-q4tu0iDyGfY&q=${query}`;
+  });
 </script>
 
 
@@ -109,8 +146,8 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        border-right: 3px solid $primary;
         padding-right: 20px;
+        transition: all 0.3s ease-in-out;
     }
 
     .photo-container {
@@ -139,13 +176,6 @@
         margin-left: auto;
         margin-right: 10px;
     }
-    
-    .localization {
-        font-size: 15px;
-        font-weight: italic;
-        margin-left: 10px;
-        text-align: left;
-    }
 
     .services {
         display: flex;
@@ -159,6 +189,8 @@
         display: flex;
         flex-direction: row;
         border-bottom: 1px solid $primary;
+        flex-wrap: wrap;
+        font-size: 15px;
     }
 
     .service-name {
@@ -179,18 +211,100 @@
     .service-buy-button {
       margin-left: 20px;
     }
-
+//-------------Second Column------------------//
     .second-column {
         width: 30%;
         height: 100%;
         display: flex;
         flex-direction: column;
-        padding-left: 20px;
-        gap: 100px;
+        padding-left: 10px;
+        padding-right: 10px;
+        gap: 20px;
+        word-wrap: break-word;
+        overflow: hidden;
+        background-color: rgb(228, 228, 228);
+        border-radius: 20px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .map-iframe {
+      width: 95%;
+      height: 250px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0px 10px 20px 2px $shadow;
+    }
+    
+    .address {
+      border-bottom: 1px solid $primary;
+
+    }
+
+    .open-hours {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 50px;
+      flex-wrap: wrap;
+      padding-bottom: 20px;
+      border-bottom: 1px solid $primary;
+    }
+
+    .week-day {
+      margin: 0px;
+      text-align: left;
+    }
+
+    .day-hours{
+      margin: 0px;
+      text-align: right;
+    }
+    
+    .description {
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      padding-bottom: 20px;
+      border-bottom: 1px solid $primary;
+    }
+
+    
+    .category {
+
     }
 
     .owner-panel {
         display: flex;
         flex-direction: column;
+    }
+
+    @media screen and (max-width: 1000px) {
+        .service-buy-button {
+            width: 100%;
+        }
+
+        .main {
+            flex-direction: column;
+            padding: 0px;
+        }
+
+        .first-column {
+            width: 100%;
+            border-right: none;
+            padding-right: 0px;
+        }
+
+        .second-column {
+            width: 100%;
+            padding-left: 0px;
+            background-color: transparent;
+        }
+
+        .map-iframe {
+          height: 400px;
+        }
+      
     }
 </style>
