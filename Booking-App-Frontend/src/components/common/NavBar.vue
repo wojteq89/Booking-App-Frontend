@@ -85,7 +85,7 @@ export default defineComponent({
 }
 
 .navbar.scrolled {
-    width: 95%;
+    width: 85%;
     left: 50%;
     top: 20px;
     transform: translateX(-50%);
@@ -110,5 +110,12 @@ export default defineComponent({
 .profile-button:hover {
     background-color: $primary;
     color: $white;
+}
+
+@media screen and (max-width: 768px) {
+    .navbar.scrolled {
+        width: 95%;
+    }
+    
 }
 </style>
