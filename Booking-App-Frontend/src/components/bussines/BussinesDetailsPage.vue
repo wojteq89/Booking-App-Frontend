@@ -104,7 +104,6 @@ import { onMounted, ref, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBusinessStore } from '@/stores/business';
 import { storeToRefs } from 'pinia';
-import App from '../../App.vue';
 
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
@@ -204,6 +203,7 @@ const nextImage = () => {
       box-shadow: 0px 10px 20px 1px $shadow;
       border-radius: 20px;
       margin: 10px 10px 30px 10px;
+
     }
 
     .image-slider {
@@ -221,13 +221,18 @@ const nextImage = () => {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: $shadow;
       color: white;
       font-size: 30px;
       border: none;
       padding: 10px;
       cursor: pointer;
       z-index: 10;
+      transition: all 0.3s ease-in-out;
+      
+      &:hover {
+        font-size: 50px;
+      }
     }
 
     .photo-nav-btn.left {
