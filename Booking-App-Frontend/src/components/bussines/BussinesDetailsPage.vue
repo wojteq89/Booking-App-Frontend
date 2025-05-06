@@ -25,11 +25,15 @@
         </button>
       </div>
       <div class="title-container">
-        <h1 class="bussines-name">{{ service.name }}</h1>
-        <button class="fav-button custom-button">❤️</button>
+        <h1 class="service-name">{{ service.name }}</h1>
+        <div class="service-add">
+          <button class="fav-button">
+            ❤️
+          </button>
+        </div>
       </div>
-      <section class="services">
-        <h2>Usługi</h2>
+      <section class="services-section">
+        <h2 class="section-name">Usługi</h2>
         <div class="service-item" v-for="i in 3" :key="i">
           <h3>Strzyżenie włosów</h3>
           <div class="service-buy">
@@ -38,10 +42,64 @@
           </div>
           <button class="service-buy-button custom-button">Umów</button>
         </div>
+        <button class="add-service-button">
+          +
+          <span class="add-service-button-text">Dodaj usługę</span>
+        </button>
       </section>
 
-      <section class="reviews">
-        <!-- Opinie -->
+      <section class="reviews-section">
+        <h2 class="section-name">Opinie</h2>
+        <div class="reviews-summary">
+          <div>
+            <strong>Średnia ocena: 4.5</strong>
+            <p class="star">★★★★☆</p>
+            <p>Na podstawie X opinii</p>
+          </div>
+          <div class="reviews-count">
+            <div class="reviews-column">
+              <p v-for="i in 5" :key="i" class="reviews-rating">{{ i }}</p>
+            </div>
+            <div class="reviews-column">
+              <p v-for="i in 5" :key="i" class="star">★</p>
+            </div>
+            <div class="reviews-column">
+              <p v-for="i in 5" :key="i" class="reviews-rating">{{ i }}</p>
+            </div>
+            <!-- ☆ -->
+          </div>
+        </div>
+
+        <div class="add-review">
+          <h2 class="section-name">Dodaj opinię</h2>
+          <div class="review-form">
+            <div class="review-rating">
+              <label for="rating">Ocena:</label>
+              <select id="rating" class="custom-select">
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+              </select>
+              <p class="star">★</p>
+            </div>
+            <textarea class="review-textarea" placeholder="Napisz swoją opinię..."></textarea>
+            <button class="custom-button">Dodaj opinię</button>
+          </div>
+        </div>
+
+        <div class="user-reviews">
+          <h2 class="section-name">Opinię innych uytkowników</h2>
+          <div class="review-item" v-for="i in 3" :key="i">
+            <div class="review-info">
+              <p class="review-author">Jan Kowalski</p>
+              <p class="review-rating">★★★★☆</p>
+              <p class="review-date">2023-10-01</p>
+            </div>
+            <p class="review-text">Bardzo dobra usługa!</p>
+          </div>
+        </div>
       </section>
     </section>
 
@@ -63,12 +121,16 @@
       <strong>Godziny otwarcia:</strong>
       <div class="open-hours">
         <div>
-          <p class="week-day" v-for="(day, index) in ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']" :key="index">
+          <p class="week-day"
+            v-for="(day, i) in ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']"
+            :key="i"
+            :class="{ 'today': i === todayIndex }"
+          >
             {{ day }}
           </p>
         </div>
         <div  v-if="service.opening_hours">
-            <p class="day-hours" v-for="(line, i) in service.opening_hours.split('\n')" :key="i">
+            <p class="day-hours" v-for="(line, i) in service.opening_hours.split('\n')" :key="i" :class="{ 'today': i === todayIndex }">
               {{ line }}<br />
             </p>
         </div>
@@ -111,6 +173,7 @@ const { myService: service } = storeToRefs(businessStore);
 
 const isOwner = ref(false);
 const currentImageIndex = ref(0);
+const todayIndex = (new Date().getDay() + 6) % 7;
 
 onMounted(async () => {
   try {
@@ -137,10 +200,10 @@ const checkIsOwner = () => {
   }
 };
 
-const mapUrl = computed(() => {
-  const query = encodeURIComponent(service.value.location || '');
-  return `https://www.google.com/maps/embed/v1/place?key=AIzaSyAKVGoLBVhgqkyjYTSOW55-q4tu0iDyGfY&q=${query}`;
-});
+// const mapUrl = computed(() => {
+//   const query = encodeURIComponent(service.value.location || '');
+//   return `https://www.google.com/maps/embed/v1/place?key=AIzaSyAKVGoLBVhgqkyjYTSOW55-q4tu0iDyGfY&q=${query}`;
+// });
 
 const parsedImages = computed(() => {
   try {
@@ -254,23 +317,41 @@ const nextImage = () => {
         height: auto;
     }
     
-    .bussines-name {
-        font-size: 30px;
-        font-weight: bold;
-        margin-left: 10px;
+    .service-name {
+      position: relative;
+      font-size: 30px;
+      font-weight: bold;
+      display: inline-block;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        height: 2px;
+        width: 120%;
+        background: $primary;
+        transform: scaleX(1);
+      }
     }
     
     .fav-button {
         margin-left: auto;
-        margin-right: 10px;
+        background-color: transparent;
+        border: none;
+        font-size: 22px;
+        transition: all 0.3s ease-in-out;
+        outline: none;
+
+        &:hover {
+          transform: scale(1.5);
+        }
     }
 
-    .services {
+    .services-section {
         display: flex;
         flex-direction: column;
-        gap: 20px;
         text-align: left;
-        margin: 10px;
     }
 
     .service-item {
@@ -279,6 +360,25 @@ const nextImage = () => {
         border-bottom: 1px solid $primary;
         flex-wrap: wrap;
         font-size: 15px;
+        position: relative;
+        overflow: hidden;
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          height: 2px;
+          width: 100%;
+          background: $primary;
+          transform: scaleX(0);
+          transform-origin: center;
+          transition: transform 0.3s ease-in-out;
+        }
+
+        &:hover::after {
+          transform: scaleX(1);
+        }
     }
 
     .service-name {
@@ -286,10 +386,17 @@ const nextImage = () => {
     }
     
     .service-buy {
-        display: flex;
-        flex-direction: row;
-        margin-left: auto;
-        gap: 20px;
+      display: flex;
+      flex-direction: row;
+      margin-left: auto;
+      gap: 20px;
+    }
+
+    .service-add {
+      display: flex;
+      flex-direction: row;
+      margin-left: auto;
+      gap: 20px;
     }
 
     .service-price {
@@ -298,6 +405,175 @@ const nextImage = () => {
 
     .service-buy-button {
       margin-left: 20px;
+      margin-top: 10px;
+    }
+
+    .add-service-button {
+      position: relative;
+      background-color: transparent;
+      font-size: 35px;
+      padding: 0;
+      color: $primary;
+      border-radius: 0;
+      margin-bottom: 20px;
+      outline: none;
+      border: 1px solid transparent;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .add-service-button:hover {
+      font-size: 60px;
+    }
+
+    .add-service-button-text {
+      opacity: 0;
+      font-size: 30px;
+      visibility: hidden;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      transition: opacity 0.5s ease, transform 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .add-service-button:hover .add-service-button-text {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(55px);
+    }
+
+    .section-name {
+      text-align: left;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .reviews-section {
+      margin-bottom: 50px;
+    }
+
+    .reviews-summary {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+      gap: 50px;
+    }
+
+    .reviews-rating {
+      margin: 0px;
+      text-align: left;
+    }
+
+    .reviews-count {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .reviews-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .review-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    } 
+    
+    .review-textarea {
+      background-color: transparent;
+      border: 2px solid $primary;
+      border-radius: 10px;
+      padding: 10px;
+      resize: none;
+      height: 100px;
+      color: $primary;
+      font-size: 16px;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+      }
+    } 
+    
+    .review-rating {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    } 
+    
+    .custom-select {
+      background-color: transparent;
+      color: $primary;
+      border: 2px solid $primary;
+      border-radius: 10px;
+      padding: 5px;
+      outline: none;
+      cursor: pointer;
+      width: 50px;
+      font-size: 20px;
+      text-align: center;
+      transition: all 0.3s ease-in-out;
+
+      &:focus {
+        background-color: $primary;
+        color: $white;
+      }
+
+      &:hover {
+        background-color: $primary;
+        color: $white;
+      }
+      
+      option {
+        background-color: transparent;
+      }
+    }
+
+    .star {
+      transform: scale(2);
+      color: $primary;
+      margin: 0px;
+    }
+
+    .user-reviews  {
+      margin-top: 50px;
+    }
+
+    .review-item {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid $primary;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        width: 100%;
+        background: $primary;
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.3s ease-in-out;
+      }
+
+      &:hover::after {
+        transform: scaleX(1);
+      }
+    }
+    
+    .review-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 //-------------Second Column------------------//
     .second-column {
@@ -346,14 +622,17 @@ const nextImage = () => {
       }
     }
 
+    .today {
+      font-weight: bold;
+      border-radius: 6px;
+    }
+
     .week-day {
       margin: 0px;
-      text-align: left;
     }
 
     .day-hours{
       margin: 0px;
-      text-align: right;
     }
     
     .description {
@@ -375,9 +654,6 @@ const nextImage = () => {
     }
 
     @media screen and (max-width: 930px) {
-        .service-buy-button {
-            width: 100%;
-        }
 
         .main {
             flex-direction: column;
@@ -390,7 +666,21 @@ const nextImage = () => {
             padding-right: 0px;
         }
 
+        .service-buy-button {
+            width: 100%;
+            margin: 0px;
+            margin-bottom: 20px;
+        }
+
         .service-image {
+        }
+
+        .section-name {
+          text-align: center;
+        }
+
+        .review-rating {
+          justify-content: center;
         }
 
         .second-column {
@@ -402,6 +692,5 @@ const nextImage = () => {
         .map-iframe {
           height: 400px;
         }
-      
     }
 </style>
