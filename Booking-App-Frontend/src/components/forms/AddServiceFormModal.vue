@@ -5,10 +5,10 @@
         <h2 class="description">Dodaj nową usługę w</h2>
         <form @submit.prevent="handleSubmit" class="custom-form">
           <h2 class="business-name">{{ business.name }}</h2>
-          <input class="input-field" type="text" placeholder="Nazwa usługi" />
-          <input class="input-field" placeholder="Opis" />
-          <input class="input-field" placeholder="Czas trwania" />
-          <input class="input-field" type="number" placeholder="Cena" />
+          <input class="input-field" type="text" placeholder="Nazwa usługi" v-model="formData.name" />
+          <input class="input-field" placeholder="Opis" v-model="formData.description"/>
+          <input class="input-field" placeholder="Czas trwania (minuty)" v-model="formData.duration"/>
+          <input class="input-field" type="number" step="0.01" placeholder="Cena (np: 10.99)" v-model="formData.price"/>
           <button class="custom-button" type="submit">Dodaj usługę</button>
         </form>
         <button class="custom-button cancel-button" @click="$emit('close')">Anuluj</button>
@@ -21,22 +21,34 @@
   
 
 <script setup>
-    import { onMounted, ref, computed } from 'vue';
-    import { useAuthStore } from '@/stores/auth';
+    import { onMounted, reactive } from 'vue';
     import { useBusinessStore } from '@/stores/business';
     import { storeToRefs } from 'pinia';
-    import router from '../../router';
 
     const businessStore = useBusinessStore();
-    const authStore = useAuthStore();
     const { myBusiness: business } = storeToRefs(businessStore);
 
+    const formData = reactive({
+        service_id: business.value.id,
+        name: '',
+        description: '',
+        duration: '',
+        price: '',
+    });
 
     onMounted(async () => {
         if (business.value === null) {
             $emit('close');
         }
     });
+
+    const handleSubmit = async () => {
+        try {
+            await businessStore.addService(formData);
+        } catch (error) {
+            console.error('Error adding service:', error);
+        }
+    };
 </script>
 
 <style lang="scss" scoped>

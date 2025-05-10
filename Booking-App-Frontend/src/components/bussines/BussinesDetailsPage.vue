@@ -34,15 +34,18 @@
       </div>
       <section class="services-section">
         <h2 class="section-name">Usługi</h2>
-        <div class="service-item" v-for="i in 3" :key="i">
-          <h3>Strzyżenie włosów</h3>
+        <div class="service-item" v-for="service in services" :key="service.id">
+          <h3>{{ service.name }}</h3>
           <div class="service-buy">
-            <h3 class="service-price">30zł</h3>
-            <h3 class="service-time">30min</h3>
+            <h3 class="service-price">{{ service.price }}zł</h3>
+            <h3 class="service-time">{{ service.duration }}min</h3>
           </div>
-          <button class="service-buy-button custom-button">Umów</button>
+          <div class="service-button-row">
+            <button class="service-buy-button custom-button" @click="makeAnAppointment">Umów</button>
+            <button v-if="isOwner" class="service-delete-button custom-button" @click="deleteService(service.id)">Usuń</button>
+          </div>
         </div>
-        <button class="add-service-button" @click="addService">
+        <button v-if="isOwner" class="add-service-button" @click="addService">
           +
           <span class="add-service-button-text">Dodaj usługę</span>
         </button>
@@ -178,6 +181,7 @@ import AddServiceFormModal from '@/components/forms/AddServiceFormModal.vue';
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
 const { myBusiness: business } = storeToRefs(businessStore);
+const { serviceItems: services } = storeToRefs(businessStore);
 
 const isOwner = ref(false);
 const currentImageIndex = ref(0);
@@ -187,6 +191,7 @@ const isModalOpen = ref(false);
 onMounted(async () => {
   try {
     await businessStore.fetchMyBusiness();
+    await businessStore.fetchServices();
     checkIsOwner();
   } catch (err) {
     console.error('Błąd podczas ładowania usługi:', err);
@@ -246,6 +251,19 @@ const nextImage = () => {
 const addService = () => {
   isModalOpen.value = true;
 };
+
+const deleteService = async (id) => {
+  try {
+    await businessStore.deleteService(id);
+  } catch (err) {
+    console.error('Błąd podczas usuwania usługi:', err);
+  }
+};
+
+const makeAnAppointment = () => {
+  // Implementacja logiki umawiania wizyty
+};
+
 </script>
 
 
@@ -414,7 +432,17 @@ const addService = () => {
 
     }
 
-    .service-buy-button {
+    .service-delete-button {
+      &:hover {
+        background-color: $red;
+        color: $white;
+      }
+    }
+
+    .service-button-row {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
       margin-left: 20px;
       margin-top: 10px;
     }
@@ -696,10 +724,14 @@ const addService = () => {
             padding-right: 0px;
         }
 
-        .service-buy-button {
+        .service-buy-button, .service-delete-button {
             width: 100%;
             margin: 0px;
             margin-bottom: 20px;
+        }
+
+        .service-button-row {
+          width: 100%;
         }
 
         .section-name {

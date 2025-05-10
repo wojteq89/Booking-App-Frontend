@@ -13,6 +13,11 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async register(formData) {
       try {
+        if (!formData.first_name || !formData.second_name || !formData.email || !formData.password || !formData.city || !formData.phone_number) {
+          showAlert({ icon: 'warning', title: 'Wprowadź dane!',})
+          return;
+        }
+
         const res = await axiosPreset.post('/register', formData);
         showAlert({ icon: 'success', title: 'Zarejestrowano pomyślnie!',})
         router.push('/login');
@@ -25,6 +30,12 @@ export const useAuthStore = defineStore('auth', {
 
     async login(email, password) {
       try {
+
+        if (!email || !password) {
+          showAlert({ icon: 'warning', title: 'Wprowadź dane!',})
+          return;
+        }
+
         const res = await axiosPreset.post('/login', { email, password });
 
         this.token = res.data.token;
@@ -63,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
         }
 
         this.isLoggedIn = true;
-        console.log('Token is valid:', this.isLoggedIn);
+        //console.log('Token is valid:', this.isLoggedIn);
       } catch (err) {
         console.error('Token expiry check error:', err);
         this.logout();
