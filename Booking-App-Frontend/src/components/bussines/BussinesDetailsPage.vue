@@ -1,5 +1,5 @@
 <template>
-  <div class="main" v-if="service">
+  <div class="main" v-if="business">
     <section class="first-column">
       <div class="photo-container" v-if="parsedImages.length">
         <button
@@ -13,7 +13,7 @@
             v-for="(image, index) in parsedImages"
             :key="index"
             :src="image"
-            class="service-image"
+            class="business-image"
             alt="Zdjęcie usługi"
           />
         </div>
@@ -25,8 +25,8 @@
         </button>
       </div>
       <div class="title-container">
-        <h1 class="service-name">{{ service.name }}</h1>
-        <div class="service-add">
+        <h1 class="business-name">{{ business.name }}</h1>
+        <div class="business-add">
           <button class="fav-button">
             ❤️
           </button>
@@ -42,10 +42,16 @@
           </div>
           <button class="service-buy-button custom-button">Umów</button>
         </div>
-        <button class="add-service-button">
+        <button class="add-service-button" @click="addService">
           +
           <span class="add-service-button-text">Dodaj usługę</span>
         </button>
+
+        <Transition name="modal-fade">
+          <teleport to="body">
+            <AddServiceFormModal v-if="isModalOpen" @close="isModalOpen = false" />
+          </teleport>
+        </Transition>
       </section>
 
       <section class="reviews-section">
@@ -106,7 +112,7 @@
     <section class="second-column">
       <section class="map-container">
         <iframe class="map-iframe"
-          v-if="service.location"
+          v-if="business.location"
           :src="mapUrl"
           allowfullscreen=""
           loading="lazy"
@@ -115,7 +121,7 @@
       </section>
       <div class="address">
         <strong>Adres:</strong>
-        <p>{{ service.location }}</p>
+        <p>{{ business.location }}</p>
       </div>
 
       <strong>Godziny otwarcia:</strong>
@@ -129,8 +135,8 @@
             {{ day }}
           </p>
         </div>
-        <div  v-if="service.opening_hours">
-            <p class="day-hours" v-for="(line, i) in service.opening_hours.split('\n')" :key="i" :class="{ 'today': i === todayIndex }">
+        <div  v-if="business.opening_hours">
+            <p class="day-hours" v-for="(line, i) in business.opening_hours.split('\n')" :key="i" :class="{ 'today': i === todayIndex }">
               {{ line }}<br />
             </p>
         </div>
@@ -139,18 +145,18 @@
 
       <div class="description">
         <strong>Opis:</strong>
-        <p>{{ service.description || 'Brak opisu' }}</p>
+        <p>{{ business.description || 'Brak opisu' }}</p>
       </div>
       
       <div class="category">
         <strong>Kategoria:</strong>
-        <p>{{ service.category }}</p>
+        <p>{{ business.category }}</p>
       </div>
 
       <section v-if="isOwner" class="owner-panel">
         <strong>Panel właściciela:</strong>
         <button class="custom-button">Edytuj</button>
-        <button class="custom-button delete-button" @click="deleteService">Usuń</button>
+        <button class="custom-button delete-button" @click="deleteBusiness">Usuń</button>
       </section>
     </section>
   </div>
@@ -166,27 +172,30 @@ import { onMounted, ref, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBusinessStore } from '@/stores/business';
 import { storeToRefs } from 'pinia';
+import router from '../../router';
+import AddServiceFormModal from '@/components/forms/AddServiceFormModal.vue';
 
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
-const { myService: service } = storeToRefs(businessStore);
+const { myBusiness: business } = storeToRefs(businessStore);
 
 const isOwner = ref(false);
 const currentImageIndex = ref(0);
 const todayIndex = (new Date().getDay() + 6) % 7;
+const isModalOpen = ref(false);
 
 onMounted(async () => {
   try {
-    await businessStore.fetchMyService();
+    await businessStore.fetchMyBusiness();
     checkIsOwner();
   } catch (err) {
     console.error('Błąd podczas ładowania usługi:', err);
   }
 });
 
-const deleteService = async () => {
+const deleteBusiness = async () => {
   try {
-    await businessStore.deleteMyService();
+    await businessStore.deleteMyBusiness();
   } catch (err) {
     console.error('Błąd podczas usuwania usługi:', err);
   }
@@ -194,20 +203,20 @@ const deleteService = async () => {
 
 const checkIsOwner = () => {
   try {
-    isOwner.value = authStore.user.id === businessStore.myService.user_id;
+    isOwner.value = authStore.user.id === businessStore.myBusiness.user_id;
   } catch (err) {
     console.error('Błąd podczas sprawdzania właściciela:', err);
   }
 };
 
 // const mapUrl = computed(() => {
-//   const query = encodeURIComponent(service.value.location || '');
+//   const query = encodeURIComponent(business.value.location || '');
 //   return `https://www.google.com/maps/embed/v1/place?key=AIzaSyAKVGoLBVhgqkyjYTSOW55-q4tu0iDyGfY&q=${query}`;
 // });
 
 const parsedImages = computed(() => {
   try {
-    const imagesArray = service.value?.images ? JSON.parse(service.value.images) : [];
+    const imagesArray = business.value?.images ? JSON.parse(business.value.images) : [];
     return imagesArray.map(image => `http://127.0.0.1:8000${image}`);
   } catch (e) {
     console.error("Błąd parsowania zdjęć:", e);
@@ -233,6 +242,10 @@ const nextImage = () => {
     currentImageIndex.value++;
   }
 };
+
+const addService = () => {
+  isModalOpen.value = true;
+};
 </script>
 
 
@@ -250,6 +263,8 @@ const nextImage = () => {
         margin-top: 20px;
         margin-bottom: 20px;
     }
+
+//------------- First Column ------------------//
 
     .first-column {
         width: 70%;
@@ -274,7 +289,7 @@ const nextImage = () => {
       transition: transform 0.5s ease;
     }
 
-    .service-image {
+    .business-image {
       width: 100%;
       object-fit: cover;
       border-radius: 20px;
@@ -290,7 +305,7 @@ const nextImage = () => {
       border: none;
       padding: 10px;
       cursor: pointer;
-      z-index: 10;
+      z-index: 2;
       transition: all 0.3s ease-in-out;
       
       &:hover {
@@ -317,7 +332,7 @@ const nextImage = () => {
         height: auto;
     }
     
-    .service-name {
+    .business-name {
       position: relative;
       font-size: 30px;
       font-weight: bold;
@@ -380,10 +395,6 @@ const nextImage = () => {
           transform: scaleX(1);
         }
     }
-
-    .service-name {
-
-    }
     
     .service-buy {
       display: flex;
@@ -392,7 +403,7 @@ const nextImage = () => {
       gap: 20px;
     }
 
-    .service-add {
+    .business-add {
       display: flex;
       flex-direction: row;
       margin-left: auto;
@@ -422,7 +433,7 @@ const nextImage = () => {
     }
 
     .add-service-button:hover {
-      font-size: 60px;
+      font-size: 50px;
     }
 
     .add-service-button-text {
@@ -431,14 +442,16 @@ const nextImage = () => {
       visibility: hidden;
       position: absolute;
       left: 50%;
+      font-size: 10px;
       transform: translateX(-50%) translateY(10px);
-      transition: opacity 0.5s ease, transform 0.3s ease;
+      transition: opacity 0.5s ease, transform 0.3s ease, font-size 0.3s ease;
       white-space: nowrap;
     }
 
     .add-service-button:hover .add-service-button-text {
       opacity: 1;
       visibility: visible;
+      font-size: 25px;
       transform: translateX(-50%) translateY(55px);
     }
 
@@ -495,11 +508,8 @@ const nextImage = () => {
       height: 100px;
       color: $primary;
       font-size: 16px;
+      outline: none;
 
-      &:focus {
-        outline: none;
-        border-color: $primary;
-      }
     } 
     
     .review-rating {
@@ -575,7 +585,7 @@ const nextImage = () => {
       justify-content: space-between;
       align-items: center;
     }
-//-------------Second Column------------------//
+//------------- Second Column ------------------//
     .second-column {
         width: 30%;
         height: 100%;
@@ -653,6 +663,26 @@ const nextImage = () => {
         flex-direction: column;
     }
 
+//------------- Modal Styles ------------------//
+
+
+    .modal-fade-enter-active,
+    .modal-fade-leave-active {
+      transition: opacity 0.5s ease;
+    }
+
+    .modal-fade-enter-from,
+    .modal-fade-leave-to {
+      opacity: 0;
+    }
+
+    .modal-fade-enter-to,
+    .modal-fade-leave-from {
+      opacity: 1;
+    }
+
+//------------- Mobile ------------------//
+
     @media screen and (max-width: 930px) {
 
         .main {
@@ -670,9 +700,6 @@ const nextImage = () => {
             width: 100%;
             margin: 0px;
             margin-bottom: 20px;
-        }
-
-        .service-image {
         }
 
         .section-name {

@@ -5,14 +5,14 @@ import Swal from 'sweetalert2';
 
 export const useBusinessStore = defineStore('business', {
   state: () => ({
-    myService: null,
+    myBusiness: null,
     selectedService: null,
   }),
 
   actions: {
     async registerBusiness(formData) {
       try {
-        const res = await axiosPreset.post('/services-add', formData);
+        const res = await axiosPreset.post('/business-add', formData);
         showAlert({ icon: 'success', title: 'Twój biznes został pomyślnie zarejestrowany!' });
         router.push('/my-business');
         return res.data;
@@ -22,10 +22,10 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
-    async fetchMyService() {
+    async fetchMyBusiness() {
       try {
-        const res = await axiosPreset.get('/my-service');
-        this.myService = res.data.service;
+        const res = await axiosPreset.get('/my-business');
+        this.myBusiness = res.data.service;
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać Twojej usługi' });
         router.push('/settings');
@@ -35,7 +35,7 @@ export const useBusinessStore = defineStore('business', {
 
     async fetchServiceById(id) {
       try {
-        const res = await axiosPreset.get(`/services/${id}`);
+        const res = await axiosPreset.get(`/business/${id}`);
         this.selectedService = res.data.service;
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie znaleziono usługi' });
@@ -43,7 +43,7 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
-    async deleteMyService() {
+    async deleteMyBusiness() {
       const confirmation = await Swal.fire({
         title: 'Czy na pewno chcesz usunąć usługę?',
         text: 'Tej operacji nie można cofnąć!',
@@ -60,8 +60,8 @@ export const useBusinessStore = defineStore('business', {
     
       if (confirmation.isConfirmed) {
         try {
-          const id = this.myService.id;
-          const res = await axiosPreset.delete(`/services-delete/${id}`);
+          const id = this.myBusiness.id;
+          const res = await axiosPreset.delete(`/business-delete/${id}`);
           showAlert({ icon: 'success', title: 'Usługa została pomyślnie usunięta!' });
           router.push('/settings');
           return res.data;

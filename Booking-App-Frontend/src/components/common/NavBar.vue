@@ -79,7 +79,7 @@ export default defineComponent({
     padding-top: 10px;
     padding-bottom: 10px;
     background-color: $white;
-    z-index: 999;
+    z-index: 50;
     transition: all 0.5s ease-in-out;
     background-color: $white;
 }
