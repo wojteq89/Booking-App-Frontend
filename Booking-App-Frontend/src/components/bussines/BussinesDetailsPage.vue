@@ -100,13 +100,13 @@
 
         <div class="user-reviews">
           <h2 class="section-name">Opinię innych uytkowników</h2>
-          <div class="review-item" v-for="i in 3" :key="i">
+          <div class="review-item" v-for="review in reviews" :key="review.id">
             <div class="review-info">
-              <p class="review-author">Jan Kowalski</p>
-              <p class="review-rating">★★★★☆</p>
-              <p class="review-date">2023-10-01</p>
+              <p class="review-author">{{ review.client_name }}</p>
+              <p class="review-rating"><span v-for="i in review.rating">★</span></p>
+              <p class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</p>
             </div>
-            <p class="review-text">Bardzo dobra usługa!</p>
+            <p class="review-text">{{ review.content }}</p>
           </div>
         </div>
       </section>
@@ -182,6 +182,7 @@ const businessStore = useBusinessStore();
 const authStore = useAuthStore();
 const { myBusiness: business } = storeToRefs(businessStore);
 const { serviceItems: services } = storeToRefs(businessStore);
+const { serviceReviews: reviews } = storeToRefs(businessStore);
 
 const isOwner = ref(false);
 const currentImageIndex = ref(0);
@@ -192,6 +193,7 @@ onMounted(async () => {
   try {
     await businessStore.fetchMyBusiness();
     await businessStore.fetchServices();
+    await businessStore.fetchReviews();
     checkIsOwner();
   } catch (err) {
     console.error('Błąd podczas ładowania usługi:', err);

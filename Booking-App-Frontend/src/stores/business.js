@@ -8,6 +8,7 @@ export const useBusinessStore = defineStore('business', {
     myBusiness: null,
     selectedBusiness: null,
     serviceItems: [],
+    serviceReviews: [],
   }),
 
   actions: {
@@ -131,6 +132,17 @@ export const useBusinessStore = defineStore('business', {
       } else {
         showAlert({ icon: 'info', title: 'Usunięcie anulowane' });
         return;
+      }
+    },
+
+    async fetchReviews() {
+      try {
+        const res = await axiosPreset.get(`/service-reviews/${this.myBusiness.id}`);
+        this.serviceReviews = res.data.reviews;
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się pobrać opinii' });
+        throw err.response?.data;
       }
     },
     
