@@ -216,10 +216,11 @@ const checkIsOwner = () => {
   }
 };
 
-// const mapUrl = computed(() => {
-//   const query = encodeURIComponent(business.value.location || '');
-//   return `https://www.google.com/maps/embed/v1/place?key=AIzaSyAKVGoLBVhgqkyjYTSOW55-q4tu0iDyGfY&q=${query}`;
-// });
+const mapUrl = computed(() => {
+  const query = encodeURIComponent(business.value.location || '');
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${query}`;
+});
 
 const parsedImages = computed(() => {
   try {
