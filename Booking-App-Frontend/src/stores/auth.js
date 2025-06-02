@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import axiosPreset from '../axiosPreset';
 import router from '../router';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -47,8 +47,7 @@ export const useAuthStore = defineStore('auth', {
         router.push('/settings');
       } catch (err) {
         console.error('Login error:', err);
-        showAlert({ icon: 'error', title: 'Nie udało się zalogować',})
-        this.logout();
+        showAlert({ icon: 'error', title: 'Wprowadź poprawne dane',})
         throw err;
       }
     },
@@ -91,6 +90,24 @@ export const useAuthStore = defineStore('auth', {
       delete axiosPreset.defaults.headers.common['Authorization'];
       showAlert({ icon: 'success', title: 'Wylogowano pomyślnie!',})
       router.push('/login')
+    },
+
+    async forgotPassword(email) {
+      try {
+        if (!email) {
+          showAlert({ icon: 'warning', title: 'Wprowadź email!',})
+          return;
+        }
+
+        const res = await axiosPreset.post('/forgot-password', { email });
+        showAlert({ icon: 'success', title: 'Sprawdź swoją skrzynkę pocztową!',})
+        router.push('/login');
+        return res.data;
+      } catch (err) {
+        console.error('Reset password error:', err);
+        showAlert({ icon: 'error', title: 'Nie udało się zresetować hasła',})
+        throw err.response.data;
+      }
     },
   },
 });

@@ -9,6 +9,7 @@
                 <button class="custom-button" type="submit">Zaloguj</button>
             </form>
             <router-link to="/register">Nie masz konta? Zarejestruj się</router-link>
+            <router-link to="/reset-password">Nie pamiętam hasła</router-link>
         </div>
         <div v-if="authStore.isLoggedIn">
             <p>Zalogowano jako:  {{ authStore.user ? authStore.user.first_name : 'User' }}</p>

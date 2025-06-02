@@ -13,6 +13,7 @@
         <button type="submit" class="custom-button">Register</button>
       </form>
       <router-link to="/login">Masz już konto? Zaloguj się</router-link>
+      <router-link to="/reset-password">Nie pamiętam hasła</router-link>
     </div>
     <div v-else="authStore.user">
         <p>Zalogowano jako:  {{ authStore.user ? authStore.user.first_name : 'User' }}</p>
@@ -21,7 +22,7 @@
   </div>
 </template>
   
-  <script setup>
+<script setup>
   import { reactive } from 'vue'
   import { useAuthStore } from '@/stores/auth'
 
@@ -39,7 +40,7 @@
   const submitForm = async () => {
       await authStore.register(form)
   }
-  </script>
+</script>
   
 <style lang="scss" scoped>
     @use "@/styles/commonStyles.scss" as *;
