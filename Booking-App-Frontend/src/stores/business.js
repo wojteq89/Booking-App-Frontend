@@ -8,7 +8,12 @@ export const useBusinessStore = defineStore('business', {
     myBusiness: null,
     selectedBusiness: null,
     serviceItems: [],
-    serviceReviews: [],
+    serviceReviews: {
+      reviews: [],
+      average_rating: 0,
+      ratings_breakdown: [0, 0, 0, 0, 0],
+      total: 0
+    },
   }),
 
   actions: {
@@ -138,14 +143,32 @@ export const useBusinessStore = defineStore('business', {
     async fetchReviews() {
       try {
         const res = await axiosPreset.get(`/service-reviews/${this.myBusiness.id}`);
-        this.serviceReviews = res.data.reviews;
+        this.serviceReviews = res.data;
         return res.data;
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać opinii' });
         throw err.response?.data;
       }
     },
-    
+
+    async addReview(formDataRef) {
+      try {
+        const formData = { ...formDataRef.value };
+        formData.service_id = this.myBusiness.id;
+        if (!formData.rating || !formData.content) {
+          showAlert({ icon: 'warning', title: 'Wszystkie pola są wymagane!' });
+          return;
+        }
+
+        const res = await axiosPreset.post('/reviews-add', formData);
+        await this.fetchReviews();
+        showAlert({ icon: 'success', title: 'Opinia została pomyślnie dodana!' });
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się dodać opinii' });
+        throw err.response?.data;
+      }
+    },
   },
 });
 

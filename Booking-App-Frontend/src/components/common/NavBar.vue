@@ -104,6 +104,7 @@ export default defineComponent({
     border: 2px solid $primary;
     margin-left: auto;
     margin-right: 15px;
+    outline: none;
     transition: all 0.5s ease-in-out;
 }
 

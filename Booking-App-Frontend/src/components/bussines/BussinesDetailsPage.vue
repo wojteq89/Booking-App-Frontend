@@ -58,12 +58,16 @@
       </section>
 
       <section class="reviews-section">
-        <h2 class="section-name">Opinie</h2>
-        <div class="reviews-summary">
+        <h2 v-if="reviews.reviews.length" class="section-name">Opinie</h2>
+        <div v-if="reviews.reviews.length" class="reviews-summary">
           <div>
-            <strong>Średnia ocena: 4.5</strong>
-            <p class="star">★★★★☆</p>
-            <p>Na podstawie X opinii</p>
+            <strong>Średnia ocena: {{ reviews.average_rating }}</strong>
+            <p class="star">
+              <span v-for="i in starDisplay.full" :key="'full-' + i">★</span>
+              <span v-if="starDisplay.half">◧</span>
+              <span v-for="i in starDisplay.empty" :key="'empty-' + i">☆</span>
+            </p>
+            <p>Na podstawie {{ reviews.total }} opinii</p>
           </div>
           <div class="reviews-count">
             <div class="reviews-column">
@@ -73,18 +77,18 @@
               <p v-for="i in 5" :key="i" class="star">★</p>
             </div>
             <div class="reviews-column">
-              <p v-for="i in 5" :key="i" class="reviews-rating">{{ i }}</p>
+              <p v-for="ratings in reviews.ratings_breakdown" :key="ratings" class="reviews-rating">{{ ratings }}</p>
             </div>
             <!-- ☆ -->
           </div>
         </div>
 
-        <div class="add-review">
-          <h2 class="section-name">Dodaj opinię</h2>
+        <div class="add-review" v-if="!hasUserReviewed">
+          <h2 class="section-name">Dodaj opinie</h2>
           <div class="review-form">
             <div class="review-rating">
               <label for="rating">Ocena:</label>
-              <select id="rating" class="custom-select">
+              <select id="rating" class="custom-select" v-model="addReviewForm.rating">
                 <option value="5">5</option>
                 <option value="4">4</option>
                 <option value="3">3</option>
@@ -93,14 +97,31 @@
               </select>
               <p class="star">★</p>
             </div>
-            <textarea class="review-textarea" placeholder="Napisz swoją opinię..."></textarea>
-            <button class="custom-button">Dodaj opinię</button>
+            <textarea class="review-textarea" placeholder="Napisz swoją opinie..." v-model="addReviewForm.content"></textarea>
+            <button class="custom-button" @click="addReview">Dodaj opinie</button>
           </div>
         </div>
 
-        <div class="user-reviews">
-          <h2 class="section-name">Opinię innych uytkowników</h2>
-          <div class="review-item" v-for="review in reviews" :key="review.id">
+        <div v-else>
+          <h2 class="section-name">Dziękujemy za opinie!</h2>
+          <div class="review-item" v-if="userReview">
+            <div class="review-info">
+              <p class="review-author">{{ userReview.client_name }}</p>
+              <p class="review-rating">
+                <span v-for="i in userReview.rating" :key="i">★</span>
+              </p>
+              <p class="review-date">{{ new Date(userReview.created_at).toLocaleDateString() }}</p>
+            </div>
+            <p class="review-text">{{ userReview.content }}</p>
+          </div>
+        </div>
+
+        <div v-if="!reviews.reviews.length" class="user-reviews">
+          <h2 class="section-name">Brak innych opinii</h2>
+        </div>
+        <div class="user-reviews" v-else>
+          <h2 class="section-name">Wszystkie opinie</h2>
+          <div class="review-item" v-for="review in reviews.reviews" :key="review.id">
             <div class="review-info">
               <p class="review-author">{{ review.client_name }}</p>
               <p class="review-rating"><span v-for="i in review.rating">★</span></p>
@@ -189,6 +210,13 @@ const currentImageIndex = ref(0);
 const todayIndex = (new Date().getDay() + 6) % 7;
 const isModalOpen = ref(false);
 
+const addReviewForm = ref({
+  user_id: authStore.user.id,
+  client_name: authStore.user.first_name,
+  rating: 5,
+  content: '',
+});
+
 onMounted(async () => {
   try {
     await businessStore.fetchMyBusiness();
@@ -216,11 +244,11 @@ const checkIsOwner = () => {
   }
 };
 
-const mapUrl = computed(() => {
-  const query = encodeURIComponent(business.value.location || '');
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${query}`;
-});
+// const mapUrl = computed(() => {
+//   const query = encodeURIComponent(business.value.location || '');
+//   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+//   return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${query}`;
+// });
 
 const parsedImages = computed(() => {
   try {
@@ -266,6 +294,37 @@ const deleteService = async (id) => {
 const makeAnAppointment = () => {
   // Implementacja logiki umawiania wizyty
 };
+
+const addReview = async () => {
+  try {
+      await businessStore.addReview(addReviewForm);
+  } catch (error) {
+      console.error('Error adding review:', error);
+  }
+};
+
+const hasUserReviewed = computed(() => {
+  if (!reviews.value?.reviews) return false;
+  return reviews.value.reviews.some(review => review.user_id === authStore.user.id);
+});
+
+const userReview = computed(() => {
+  if (!reviews.value?.reviews) return null;
+  return reviews.value.reviews.find(review => review.user_id === authStore.user.id) || null;
+});
+
+const starDisplay = computed(() => {
+  const fullStars = Math.floor(reviews.value.average_rating);
+  const halfStar = reviews.value.average_rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+  return {
+    full: fullStars,
+    half: halfStar,
+    empty: emptyStars
+  };
+});
+
 
 </script>
 
@@ -321,6 +380,7 @@ const makeAnAppointment = () => {
       top: 50%;
       transform: translateY(-50%);
       background-color: $shadow;
+      outline: none;
       color: white;
       font-size: 30px;
       border: none;
