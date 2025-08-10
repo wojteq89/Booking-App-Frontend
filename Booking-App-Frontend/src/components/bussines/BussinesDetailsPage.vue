@@ -50,7 +50,7 @@
 
       <section class="reviews-section">
         <h2 v-if="reviews.reviews.length" class="section-name">Opinie</h2>
-        <div v-if="reviews.reviews.length" class="reviews-summary">
+        <div class="reviews-summary">
           <div>
             <strong>Średnia ocena: {{ reviews.average_rating }}</strong>
             <div>
@@ -70,7 +70,9 @@
               <img v-for="i in 5" :key="i" class="star" src="../../assets/Graphics/full_star.png" alt="Pełna gwiazdka">
             </div>
             <div class="reviews-column">
-              <p v-for="ratings in reviews.ratings_breakdown" :key="ratings" class="reviews-rating">{{ ratings }}</p>
+              <p v-for="(count, rating) in reviews.ratings_breakdown" :key="rating" class="reviews-rating">
+                {{ count }}
+              </p>
             </div>
           </div>
         </div>
