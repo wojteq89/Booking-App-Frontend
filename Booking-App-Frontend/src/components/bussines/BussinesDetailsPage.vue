@@ -75,7 +75,7 @@
           </div>
         </div>
 
-        <div class="add-review" v-if="!hasUserReviewed">
+        <div class="add-review" v-if="!reviews.has_user_reviewed">
           <h2 class="section-name">Dodaj opinie</h2>
           <div class="review-form">
             <div class="review-rating">
@@ -118,11 +118,23 @@
           </div>
         </div>
 
+        <h2 class="section-name">Opinie wszystkich użytkowników</h2>
+        <div class="reviews-filter">
+          Sortuj według:
+          <select id="rating" class="custom-select" v-model.number="rating" @change="onRatingChange">
+            <option :value="5">5</option>
+            <option :value="4">4</option>
+            <option :value="3">3</option>
+            <option :value="2">2</option>
+            <option :value="1">1</option>
+          </select>
+          <p v-for="value in rating" :key="value" class="star">★</p>
+          <button class="custom-button" @click="businessStore.fetchReviews(1)">Wyczyść filtr</button>
+        </div>
         <div v-if="!reviews.reviews.length" class="user-reviews">
-          <h2 class="section-name">Brak innych opinii</h2>
+          <h2 class="section-name">Brak opinii</h2>
         </div>
         <div class="user-reviews" v-else>
-          <h2 class="section-name">Opinie wszystkich użytkowników</h2>
           <div class="review-item" v-for="review in reviews.reviews" :key="review.id">
             <div class="review-info">
               <p class="review-author">{{ review.client_name }}</p>
@@ -134,9 +146,11 @@
             <p class="review-text">{{ review.content }}</p>
           </div>
           <div class="pagination">
-            <button class="custom-button" @click="loadReviews(currentPage - 1)" :disabled="currentPage === 1">Poprzednia</button>
+            <button class="custom-button" @click="loadReviews(currentPage - 1)"
+              :disabled="currentPage === 1">Poprzednia</button>
             <span>Strona {{ currentPage }} z {{ lastPage }}</span>
-            <button class="custom-button" @click="loadReviews(currentPage + 1)" :disabled="currentPage === lastPage">Następna</button>
+            <button class="custom-button" @click="loadReviews(currentPage + 1)"
+              :disabled="currentPage === lastPage">Następna</button>
           </div>
         </div>
       </section>
@@ -216,6 +230,7 @@ const todayIndex = (new Date().getDay() + 6) % 7;
 const isModalOpen = ref(false);
 const currentPage = ref(1);
 const lastPage = ref(null);
+const rating = ref(null);
 
 const addReviewForm = ref({
   user_id: authStore.user.id,
@@ -228,7 +243,7 @@ onMounted(async () => {
   try {
     await businessStore.fetchMyBusiness();
     await businessStore.fetchServices();
-    await businessStore.fetchReviews();
+    await businessStore.fetchReviews(1);
     checkIsOwner();
   } catch (err) {
     console.error('Błąd podczas ładowania usługi:', err);
@@ -344,11 +359,6 @@ const editReview = async () => {
   }
 };
 
-const hasUserReviewed = computed(() => {
-  if (!reviews.value?.reviews) return false;
-  return reviews.value.reviews.some(review => review.user_id === authStore.user.id);
-});
-
 const userReview = computed(() => {
   if (!reviews.value?.reviews) return null;
   return reviews.value.reviews.find(review => review.user_id === authStore.user.id) || null;
@@ -384,6 +394,10 @@ const loadReviews = async (page = 1) => {
     console.error('Błąd podczas ładowania opinii:', e);
   }
 };
+
+function onRatingChange() {
+  businessStore.fetchReviews(1, rating.value);
+}
 
 const starDisplay = computed(() => {
   const fullStars = Math.floor(reviews.value.average_rating);
@@ -724,6 +738,14 @@ const starDisplay = computed(() => {
 
 .user-reviews {
   margin-top: 50px;
+}
+
+.reviews-filter {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: baseline;
+
 }
 
 .review-item {
