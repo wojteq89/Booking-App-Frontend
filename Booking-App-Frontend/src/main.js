@@ -5,6 +5,7 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 import AppLogo from '@/components/common/AppLogo.vue'
+import 'leaflet/dist/leaflet.css';
 
 const app = createApp(App)
 const pinia = createPinia()

@@ -2,24 +2,14 @@
   <div class="main" v-if="business">
     <section class="first-column">
       <div class="photo-container" v-if="parsedImages.length">
-        <button
-          class="photo-nav-btn left"
-          @click="prevImage"
-          :disabled="currentImageIndex === 0">
+        <button class="photo-nav-btn left" @click="prevImage" :disabled="currentImageIndex === 0">
           &#10094;
         </button>
         <div class="image-slider" :style="sliderStyle">
-          <img
-            v-for="(image, index) in parsedImages"
-            :key="index"
-            :src="image"
-            class="business-image"
-            alt="Zdjęcie usługi"
-          />
+          <img v-for="(image, index) in parsedImages" :key="index" :src="image" class="business-image"
+            alt="Zdjęcie usługi" />
         </div>
-        <button
-          class="photo-nav-btn right"
-          @click="nextImage"
+        <button class="photo-nav-btn right" @click="nextImage"
           :disabled="currentImageIndex === parsedImages.length - 1">
           &#10095;
         </button>
@@ -42,7 +32,8 @@
           </div>
           <div class="service-button-row">
             <button class="service-buy-button custom-button" @click="makeAnAppointment">Umów</button>
-            <button v-if="isOwner" class="service-delete-button custom-button" @click="deleteService(service.id)">Usuń</button>
+            <button v-if="isOwner" class="service-delete-button custom-button"
+              @click="deleteService(service.id)">Usuń</button>
           </div>
         </div>
         <button v-if="isOwner" class="add-service-button" @click="addService">
@@ -62,11 +53,13 @@
         <div v-if="reviews.reviews.length" class="reviews-summary">
           <div>
             <strong>Średnia ocena: {{ reviews.average_rating }}</strong>
-            <p class="star">
-              <span v-for="i in starDisplay.full" :key="'full-' + i">★</span>
-              <span v-if="starDisplay.half">◧</span>
-              <span v-for="i in starDisplay.empty" :key="'empty-' + i">☆</span>
-            </p>
+            <div>
+              <img v-for="i in starDisplay.full" :key="'full-' + i" class="star"
+                src="../../assets/Graphics/full_star.png" alt="Pełna gwiazdka">
+              <img v-if="starDisplay.half" class="star" src="../../assets/Graphics/half_star.png" alt="Pół gwiazdki">
+              <img v-for="i in starDisplay.empty" :key="'empty-' + i" class="star"
+                src="../../assets/Graphics/empty_star.png" alt="Pusta gwiazdka">
+            </div>
             <p>Na podstawie {{ reviews.total }} opinii</p>
           </div>
           <div class="reviews-count">
@@ -74,7 +67,7 @@
               <p v-for="i in 5" :key="i" class="reviews-rating">{{ i }}</p>
             </div>
             <div class="reviews-column">
-              <p v-for="i in 5" :key="i" class="star">★</p>
+              <img v-for="i in 5" :key="i" class="star" src="../../assets/Graphics/full_star.png" alt="Pełna gwiazdka">
             </div>
             <div class="reviews-column">
               <p v-for="ratings in reviews.ratings_breakdown" :key="ratings" class="reviews-rating">{{ ratings }}</p>
@@ -97,13 +90,14 @@
               </select>
               <p class="star">★</p>
             </div>
-            <textarea class="review-textarea" placeholder="Napisz swoją opinie..." v-model="addReviewForm.content"></textarea>
+            <textarea class="review-textarea" placeholder="Napisz swoją opinie..."
+              v-model="addReviewForm.content"></textarea>
             <button class="custom-button" @click="addReview">Dodaj opinie</button>
           </div>
         </div>
 
         <div v-else>
-          <h2 class="section-name">Dziękujemy za opinie!</h2>
+          <h2 class="section-name">Dziękujemy za twoją opinie!</h2>
           <div class="review-item" v-if="userReview">
             <div class="review-info">
               <p class="review-author">{{ userReview.client_name }}</p>
@@ -120,7 +114,7 @@
           <h2 class="section-name">Brak innych opinii</h2>
         </div>
         <div class="user-reviews" v-else>
-          <h2 class="section-name">Wszystkie opinie</h2>
+          <h2 class="section-name">Opinie innych użytkowników</h2>
           <div class="review-item" v-for="review in reviews.reviews" :key="review.id">
             <div class="review-info">
               <p class="review-author">{{ review.client_name }}</p>
@@ -135,13 +129,7 @@
 
     <section class="second-column">
       <section class="map-container">
-        <iframe class="map-iframe"
-          v-if="business.location"
-          :src="mapUrl"
-          allowfullscreen=""
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-        ></iframe>
+        <div id="leaflet-map" class="map-iframe" v-if="business.location"></div>
       </section>
       <div class="address">
         <strong>Adres:</strong>
@@ -153,16 +141,15 @@
         <div>
           <p class="week-day"
             v-for="(day, i) in ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']"
-            :key="i"
-            :class="{ 'today': i === todayIndex }"
-          >
+            :key="i" :class="{ 'today': i === todayIndex }">
             {{ day }}
           </p>
         </div>
-        <div  v-if="business.opening_hours">
-            <p class="day-hours" v-for="(line, i) in business.opening_hours.split('\n')" :key="i" :class="{ 'today': i === todayIndex }">
-              {{ line }}<br />
-            </p>
+        <div v-if="business.opening_hours">
+          <p class="day-hours" v-for="(line, i) in business.opening_hours.split('\n')" :key="i"
+            :class="{ 'today': i === todayIndex }">
+            {{ line }}<br />
+          </p>
         </div>
         <div v-else>Brak danych</div>
       </div>
@@ -171,7 +158,7 @@
         <strong>Opis:</strong>
         <p>{{ business.description || 'Brak opisu' }}</p>
       </div>
-      
+
       <div class="category">
         <strong>Kategoria:</strong>
         <p>{{ business.category }}</p>
@@ -198,6 +185,8 @@ import { useBusinessStore } from '@/stores/business';
 import { storeToRefs } from 'pinia';
 import router from '../../router';
 import AddServiceFormModal from '@/components/forms/AddServiceFormModal.vue';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
@@ -226,7 +215,39 @@ onMounted(async () => {
   } catch (err) {
     console.error('Błąd podczas ładowania usługi:', err);
   }
+
+  if (business.value?.location) {
+    const location = business.value.location;
+
+    let lat = null, lng = null;
+
+    if (location.includes(',')) {
+      [lat, lng] = location.split(',').map(coord => parseFloat(coord.trim()));
+      initLeafletMap(lat, lng);
+    } else {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length > 0) {
+            lat = parseFloat(data[0].lat);
+            lng = parseFloat(data[0].lon);
+            initLeafletMap(lat, lng);
+          }
+        })
+        .catch(err => console.error("Błąd geokodowania:", err));
+    }
+  }
 });
+
+function initLeafletMap(lat, lng) {
+  const map = L.map('leaflet-map').setView([lat, lng], 14);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  L.marker([lat, lng]).addTo(map);
+}
 
 const deleteBusiness = async () => {
   try {
@@ -297,9 +318,9 @@ const makeAnAppointment = () => {
 
 const addReview = async () => {
   try {
-      await businessStore.addReview(addReviewForm);
+    await businessStore.addReview(addReviewForm);
   } catch (error) {
-      console.error('Error adding review:', error);
+    console.error('Error adding review:', error);
   }
 };
 
@@ -330,489 +351,487 @@ const starDisplay = computed(() => {
 
 
 <style lang="scss" scoped>
-    @use "@/styles/commonStyles.scss" as *;
-    .main {
-        display: flex;
-        justify-content: center;
-        flex-direction: row;
-        width: 90vw;
-        padding: 20px;
-        position: relative;
-        border-radius: 20px;
-        overflow: hidden;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
+@use "@/styles/commonStyles.scss" as *;
+
+.main {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  width: 90vw;
+  padding: 20px;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
 //------------- First Column ------------------//
 
-    .first-column {
-        width: 70%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        padding-right: 20px;
-        transition: all 0.3s ease-in-out;
-    }
+.first-column {
+  width: 70%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-right: 20px;
+  transition: all 0.3s ease-in-out;
+}
 
-    .photo-container {
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0px 10px 20px 1px $shadow;
-      border-radius: 20px;
-      margin: 10px 10px 30px 10px;
+.photo-container {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0px 10px 10px 1px $shadow;
+  border-radius: 10px;
+  margin: 10px 10px 30px 10px;
 
-    }
+}
 
-    .image-slider {
-      display: flex;
-      transition: transform 0.5s ease;
-    }
+.image-slider {
+  display: flex;
+  transition: transform 0.5s ease;
+}
 
-    .business-image {
-      width: 100%;
-      object-fit: cover;
-      border-radius: 20px;
-    }
+.business-image {
+  width: 100%;
+  object-fit: cover;
+}
 
-    .photo-nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background-color: $shadow;
-      outline: none;
-      color: white;
-      font-size: 30px;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      z-index: 2;
-      transition: all 0.3s ease-in-out;
-      
-      &:hover {
-        font-size: 50px;
-      }
-    }
+.photo-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: $shadow;
+  outline: none;
+  color: white;
+  font-size: 30px;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.3s ease-in-out;
 
-    .photo-nav-btn.left {
-      left: 10px;
-    }
+  &:hover {
+    font-size: 50px;
+  }
+}
 
-    .photo-nav-btn.right {
-      right: 10px;
-    }
+.photo-nav-btn.left {
+  left: 10px;
+}
 
-    .photo-nav-btn:disabled {
-      background-color: rgba(0, 0, 0, 0.2);
-      cursor: not-allowed;
-    }
+.photo-nav-btn.right {
+  right: 10px;
+}
 
-    .title-container {
-        display: flex;
-        width: 100%;
-        height: auto;
-    }
-    
-    .business-name {
-      position: relative;
-      font-size: 30px;
-      font-weight: bold;
-      display: inline-block;
+.photo-nav-btn:disabled {
+  background-color: rgba(0, 0, 0, 0.2);
+  cursor: not-allowed;
+}
 
-      &::after {
-        content: "";
-        position: absolute;
-        bottom: -10px;
-        left: 0;
-        height: 2px;
-        width: 120%;
-        background: $primary;
-        transform: scaleX(1);
-      }
-    }
-    
-    .fav-button {
-        margin-left: auto;
-        background-color: transparent;
-        border: none;
-        font-size: 22px;
-        transition: all 0.3s ease-in-out;
-        outline: none;
+.title-container {
+  display: flex;
+  width: 100%;
+  height: auto;
+}
 
-        &:hover {
-          transform: scale(1.5);
-        }
-    }
+.business-name {
+  position: relative;
+  font-size: 30px;
+  font-weight: bold;
+  display: inline-block;
 
-    .services-section {
-        display: flex;
-        flex-direction: column;
-        text-align: left;
-    }
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 2px;
+    width: 120%;
+    background: $primary;
+    transform: scaleX(1);
+  }
+}
 
-    .service-item {
-        display: flex;
-        flex-direction: row;
-        border-bottom: 1px solid $primary;
-        flex-wrap: wrap;
-        font-size: 15px;
-        position: relative;
-        overflow: hidden;
+.fav-button {
+  margin-left: auto;
+  background-color: transparent;
+  border: none;
+  font-size: 22px;
+  transition: all 0.3s ease-in-out;
+  outline: none;
 
-        &::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          height: 2px;
-          width: 100%;
-          background: $primary;
-          transform: scaleX(0);
-          transform-origin: center;
-          transition: transform 0.3s ease-in-out;
-        }
+  &:hover {
+    transform: scale(1.5);
+  }
+}
 
-        &:hover::after {
-          transform: scaleX(1);
-        }
-    }
-    
-    .service-buy {
-      display: flex;
-      flex-direction: row;
-      margin-left: auto;
-      gap: 20px;
-    }
+.services-section {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
 
-    .business-add {
-      display: flex;
-      flex-direction: row;
-      margin-left: auto;
-      gap: 20px;
-    }
+.service-item {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid $primary;
+  flex-wrap: wrap;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
 
-    .service-price {
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: $primary;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease-in-out;
+  }
 
-    }
+  &:hover::after {
+    transform: scaleX(1);
+  }
+}
 
-    .service-delete-button {
-      &:hover {
-        background-color: $red;
-        color: $white;
-      }
-    }
+.service-buy {
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+  gap: 20px;
+}
 
-    .service-button-row {
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
-      margin-left: 20px;
-      margin-top: 10px;
-    }
+.business-add {
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+  gap: 20px;
+}
 
-    .add-service-button {
-      position: relative;
-      background-color: transparent;
-      font-size: 35px;
-      padding: 0;
-      color: $primary;
-      border-radius: 0;
-      margin-bottom: 20px;
-      outline: none;
-      border: 1px solid transparent;
-      transition: all 0.3s ease-in-out;
-    }
+.service-price {}
 
-    .add-service-button:hover {
-      font-size: 50px;
-    }
+.service-delete-button {
+  &:hover {
+    background-color: $red;
+    color: $white;
+  }
+}
 
-    .add-service-button-text {
-      opacity: 0;
-      font-size: 30px;
-      visibility: hidden;
-      position: absolute;
-      left: 50%;
-      font-size: 10px;
-      transform: translateX(-50%) translateY(10px);
-      transition: opacity 0.5s ease, transform 0.3s ease, font-size 0.3s ease;
-      white-space: nowrap;
-    }
+.service-button-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-left: 20px;
+  margin-top: 10px;
+}
 
-    .add-service-button:hover .add-service-button-text {
-      opacity: 1;
-      visibility: visible;
-      font-size: 25px;
-      transform: translateX(-50%) translateY(55px);
-    }
+.add-service-button {
+  position: relative;
+  background-color: transparent;
+  font-size: 35px;
+  padding: 0;
+  color: $primary;
+  border-radius: 0;
+  margin-bottom: 20px;
+  outline: none;
+  border: 1px solid transparent;
+  transition: all 0.3s ease-in-out;
+}
 
-    .section-name {
-      text-align: left;
-      transition: all 0.3s ease-in-out;
-    }
+.add-service-button:hover {
+  font-size: 50px;
+}
 
-    .reviews-section {
-      margin-bottom: 50px;
-    }
+.add-service-button-text {
+  opacity: 0;
+  font-size: 30px;
+  visibility: hidden;
+  position: absolute;
+  left: 50%;
+  font-size: 10px;
+  transform: translateX(-50%) translateY(10px);
+  transition: opacity 0.5s ease, transform 0.3s ease, font-size 0.3s ease;
+  white-space: nowrap;
+}
 
-    .reviews-summary {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 30px;
-      gap: 50px;
-    }
+.add-service-button:hover .add-service-button-text {
+  opacity: 1;
+  visibility: visible;
+  font-size: 25px;
+  transform: translateX(-50%) translateY(55px);
+}
 
-    .reviews-rating {
-      margin: 0px;
-      text-align: left;
-    }
+.section-name {
+  text-align: left;
+  transition: all 0.3s ease-in-out;
+}
 
-    .reviews-count {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-    }
+.reviews-section {
+  margin-bottom: 50px;
+}
 
-    .reviews-column {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+.reviews-summary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+  gap: 50px;
+}
 
-    .review-form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    } 
-    
-    .review-textarea {
-      background-color: transparent;
-      border: 2px solid $primary;
-      border-radius: 10px;
-      padding: 10px;
-      resize: none;
-      height: 100px;
-      color: $primary;
-      font-size: 16px;
-      outline: none;
+.reviews-rating {
+  margin: 0px;
+  text-align: left;
+}
 
-    } 
-    
-    .review-rating {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 10px;
-    } 
-    
-    .custom-select {
-      background-color: transparent;
-      color: $primary;
-      border: 2px solid $primary;
-      border-radius: 10px;
-      padding: 5px;
-      outline: none;
-      cursor: pointer;
-      width: 50px;
-      font-size: 20px;
-      text-align: center;
-      transition: all 0.3s ease-in-out;
+.reviews-count {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
 
-      &:focus {
-        background-color: $primary;
-        color: $white;
-      }
+.reviews-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-      &:hover {
-        background-color: $primary;
-        color: $white;
-      }
-      
-      option {
-        background-color: transparent;
-      }
-    }
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-    .star {
-      transform: scale(2);
-      color: $primary;
-      margin: 0px;
-    }
+.review-textarea {
+  background-color: transparent;
+  border: 2px solid $primary;
+  border-radius: 10px;
+  padding: 10px;
+  resize: none;
+  height: 100px;
+  color: $primary;
+  font-size: 16px;
+  outline: none;
 
-    .user-reviews  {
-      margin-top: 50px;
-    }
+}
 
-    .review-item {
-      position: relative;
-      overflow: hidden;
-      border-bottom: 1px solid $primary;
+.review-rating {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
 
-      &::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: 2px;
-        width: 100%;
-        background: $primary;
-        transform: scaleX(0);
-        transform-origin: center;
-        transition: transform 0.3s ease-in-out;
-      }
+.custom-select {
+  background-color: transparent;
+  color: $primary;
+  border: 2px solid $primary;
+  border-radius: 10px;
+  padding: 5px;
+  outline: none;
+  cursor: pointer;
+  width: 50px;
+  font-size: 20px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
 
-      &:hover::after {
-        transform: scaleX(1);
-      }
-    }
-    
-    .review-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  &:focus {
+    background-color: $primary;
+    color: $white;
+  }
+
+  &:hover {
+    background-color: $primary;
+    color: $white;
+  }
+
+  option {
+    background-color: transparent;
+  }
+}
+
+.star {
+  width: 15px;
+  color: $primary;
+  margin: 5px;
+}
+
+.user-reviews {
+  margin-top: 50px;
+}
+
+.review-item {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid $primary;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: $primary;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+.review-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 //------------- Second Column ------------------//
-    .second-column {
-        width: 30%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        padding-left: 10px;
-        padding-right: 10px;
-        gap: 20px;
-        word-wrap: break-word;
-        overflow: hidden;
-        background-color: rgb(228, 228, 228);
-        border-radius: 20px;
-        transition: all 0.3s ease-in-out;
-    }
+.second-column {
+  width: 30%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  padding-right: 10px;
+  gap: 20px;
+  word-wrap: break-word;
+  overflow: hidden;
+  background-color: rgb(245, 245, 245);
+  border-radius: 20px;
+  transition: all 0.3s ease-in-out;
+}
 
-    .map-iframe {
-      width: 95%;
-      height: 250px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0px 10px 20px 2px $shadow;
-    }
-    
-    .address {
-      border-bottom: 1px solid $primary;
+.map-iframe {
+  width: 100%;
+  height: 250px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0px 10px 20px 2px $shadow;
+}
 
-    }
+.address {
+  border-bottom: 1px solid $primary;
 
-    .open-hours {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 50px;
-      flex-wrap: wrap;
-      padding-bottom: 20px;
-      border-bottom: 1px solid $primary;
+}
 
-      div{
-        gap: 10px;
-        display: flex;
-        flex-direction: column;
-      }
-    }
+.open-hours {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $primary;
 
-    .today {
-      font-weight: bold;
-      border-radius: 6px;
-    }
+  div {
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+}
 
-    .week-day {
-      margin: 0px;
-    }
+.today {
+  font-weight: bold;
+  border-radius: 6px;
+}
 
-    .day-hours{
-      margin: 0px;
-    }
-    
-    .description {
-      word-wrap: break-word;
-      white-space: pre-wrap;
-      overflow-wrap: break-word;
-      padding-bottom: 20px;
-      border-bottom: 1px solid $primary;
-    }
+.week-day {
+  margin: 0px;
+}
 
-    
-    .category {
+.day-hours {
+  margin: 0px;
+}
 
-    }
+.description {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $primary;
+}
 
-    .owner-panel {
-        display: flex;
-        flex-direction: column;
-    }
+
+.category {}
+
+.owner-panel {
+  display: flex;
+  flex-direction: column;
+}
 
 //------------- Modal Styles ------------------//
 
 
-    .modal-fade-enter-active,
-    .modal-fade-leave-active {
-      transition: opacity 0.5s ease;
-    }
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
 
-    .modal-fade-enter-from,
-    .modal-fade-leave-to {
-      opacity: 0;
-    }
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
 
-    .modal-fade-enter-to,
-    .modal-fade-leave-from {
-      opacity: 1;
-    }
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+}
 
 //------------- Mobile ------------------//
 
-    @media screen and (max-width: 930px) {
+@media screen and (max-width: 930px) {
 
-        .main {
-            flex-direction: column;
-            padding: 0px;
-        }
+  .main {
+    flex-direction: column;
+    padding: 0px;
+  }
 
-        .first-column {
-            width: 100%;
-            border-right: none;
-            padding-right: 0px;
-        }
+  .first-column {
+    width: 100%;
+    border-right: none;
+    padding-right: 0px;
+  }
 
-        .service-buy-button, .service-delete-button {
-            width: 100%;
-            margin: 0px;
-            margin-bottom: 20px;
-        }
+  .service-buy-button,
+  .service-delete-button {
+    width: 100%;
+    margin: 0px;
+    margin-bottom: 20px;
+  }
 
-        .service-button-row {
-          width: 100%;
-        }
+  .service-button-row {
+    width: 100%;
+  }
 
-        .section-name {
-          text-align: center;
-        }
+  .section-name {
+    text-align: center;
+  }
 
-        .review-rating {
-          justify-content: center;
-        }
+  .review-rating {
+    justify-content: center;
+  }
 
-        .second-column {
-            width: 100%;
-            padding-left: 0px;
-            background-color: transparent;
-        }
+  .second-column {
+    width: 100%;
+    padding-left: 0px;
+    background-color: transparent;
+  }
 
-        .map-iframe {
-          height: 400px;
-        }
-    }
+  .map-iframe {
+    height: 400px;
+  }
+}
 </style>

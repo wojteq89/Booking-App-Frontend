@@ -18,6 +18,15 @@
     flex-direction: column;
     gap: 30px;
     width: 80%;
+
+    p {
+        margin-top: -10px;
+        margin-bottom: -10px;
+        margin-left: 10px;
+        text-align: left;
+        color: $red;
+        opacity: 0.6;
+    }
 }
 
 .title {
