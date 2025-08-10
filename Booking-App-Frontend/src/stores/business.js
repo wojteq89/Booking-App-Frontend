@@ -64,7 +64,7 @@ export const useBusinessStore = defineStore('business', {
         confirmButtonColor: '#d33',
         cancelButtonColor: '$primary',
       });
-    
+
       if (confirmation.isConfirmed) {
         try {
           const id = this.myBusiness.id;
@@ -166,6 +166,24 @@ export const useBusinessStore = defineStore('business', {
         return res.data;
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się dodać opinii' });
+        throw err.response?.data;
+      }
+    },
+
+    async editReview(formDataRef) {
+      try {
+        const formData = { ...formDataRef.value };
+        if (!formData.rating || !formData.content) {
+          showAlert({ icon: 'warning', title: 'Wszystkie pola są wymagane!' });
+          return;
+        }
+
+        const res = await axiosPreset.put(`/reviews-update/${formData.id}`, formData);
+        await this.fetchReviews();
+        showAlert({ icon: 'success', title: 'Opinia została pomyślnie zaaktualizowana!' });
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się zaaktualizować opinii' });
         throw err.response?.data;
       }
     },

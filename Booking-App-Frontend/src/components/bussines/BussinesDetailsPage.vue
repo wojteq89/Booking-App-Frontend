@@ -72,7 +72,6 @@
             <div class="reviews-column">
               <p v-for="ratings in reviews.ratings_breakdown" :key="ratings" class="reviews-rating">{{ ratings }}</p>
             </div>
-            <!-- ☆ -->
           </div>
         </div>
 
@@ -81,14 +80,14 @@
           <div class="review-form">
             <div class="review-rating">
               <label for="rating">Ocena:</label>
-              <select id="rating" class="custom-select" v-model="addReviewForm.rating">
+              <select id="rating" class="custom-select" v-model.number="addReviewForm.rating">
                 <option value="5">5</option>
                 <option value="4">4</option>
                 <option value="3">3</option>
                 <option value="2">2</option>
                 <option value="1">1</option>
               </select>
-              <p class="star">★</p>
+              <p v-for="value in addReviewForm.rating" :key="value" class="star">★</p>
             </div>
             <textarea class="review-textarea" placeholder="Napisz swoją opinie..."
               v-model="addReviewForm.content"></textarea>
@@ -98,15 +97,24 @@
 
         <div v-else>
           <h2 class="section-name">Dziękujemy za twoją opinie!</h2>
-          <div class="review-item" v-if="userReview">
-            <div class="review-info">
-              <p class="review-author">{{ userReview.client_name }}</p>
-              <p class="review-rating">
-                <span v-for="i in userReview.rating" :key="i">★</span>
-              </p>
-              <p class="review-date">{{ new Date(userReview.created_at).toLocaleDateString() }}</p>
+          <div class="review-form">
+            <div class="review-rating">
+              <label for="rating">Ocena:</label>
+              <select id="rating" class="custom-select" v-model.number="editReviewForm.rating">
+                <option :value="5">5</option>
+                <option :value="4">4</option>
+                <option :value="3">3</option>
+                <option :value="2">2</option>
+                <option :value="1">1</option>
+              </select>
+
+              <p v-for="value in editReviewForm.rating" :key="value" class="star">★</p>
             </div>
-            <p class="review-text">{{ userReview.content }}</p>
+            <textarea class="review-textarea" :placeholder="userReview?.content || 'Napisz swoją opinię...'"
+              v-model="editReviewForm.content">
+            </textarea>
+
+            <button class="custom-button" @click="editReview">Edytuj opinie</button>
           </div>
         </div>
 
@@ -114,7 +122,7 @@
           <h2 class="section-name">Brak innych opinii</h2>
         </div>
         <div class="user-reviews" v-else>
-          <h2 class="section-name">Opinie innych użytkowników</h2>
+          <h2 class="section-name">Opinie wszystkich użytkowników</h2>
           <div class="review-item" v-for="review in reviews.reviews" :key="review.id">
             <div class="review-info">
               <p class="review-author">{{ review.client_name }}</p>
@@ -179,7 +187,7 @@
 
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBusinessStore } from '@/stores/business';
 import { storeToRefs } from 'pinia';
@@ -187,6 +195,7 @@ import router from '../../router';
 import AddServiceFormModal from '@/components/forms/AddServiceFormModal.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
 
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
@@ -265,12 +274,6 @@ const checkIsOwner = () => {
   }
 };
 
-// const mapUrl = computed(() => {
-//   const query = encodeURIComponent(business.value.location || '');
-//   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-//   return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${query}`;
-// });
-
 const parsedImages = computed(() => {
   try {
     const imagesArray = business.value?.images ? JSON.parse(business.value.images) : [];
@@ -324,6 +327,14 @@ const addReview = async () => {
   }
 };
 
+const editReview = async () => {
+  try {
+    await businessStore.editReview(editReviewForm);
+  } catch (error) {
+    console.error('Error adding review:', error);
+  }
+};
+
 const hasUserReviewed = computed(() => {
   if (!reviews.value?.reviews) return false;
   return reviews.value.reviews.some(review => review.user_id === authStore.user.id);
@@ -333,6 +344,22 @@ const userReview = computed(() => {
   if (!reviews.value?.reviews) return null;
   return reviews.value.reviews.find(review => review.user_id === authStore.user.id) || null;
 });
+
+const editReviewForm = ref({
+  user_id: authStore.user.id,
+  id: null,
+  client_name: authStore.user.first_name,
+  rating: null,
+  content: '',
+});
+
+watch(userReview, (newReview) => {
+  if (newReview) {
+    editReviewForm.value.id = newReview.id;
+    editReviewForm.value.rating = Number(newReview.rating);
+    editReviewForm.value.content = newReview.content || '';
+  }
+}, { immediate: true });
 
 const starDisplay = computed(() => {
   const fullStars = Math.floor(reviews.value.average_rating);
@@ -630,8 +657,8 @@ const starDisplay = computed(() => {
 }
 
 .custom-select {
-  background-color: transparent;
-  color: $primary;
+  background-color: $primary;
+  color: $white;
   border: 2px solid $primary;
   border-radius: 10px;
   padding: 5px;
@@ -643,13 +670,13 @@ const starDisplay = computed(() => {
   transition: all 0.3s ease-in-out;
 
   &:focus {
-    background-color: $primary;
-    color: $white;
+    background-color: transparent;
+    color: $primary;
   }
 
   &:hover {
-    background-color: $primary;
-    color: $white;
+    background-color: transparent;
+    color: $primary;
   }
 
   option {
