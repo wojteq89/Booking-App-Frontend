@@ -140,9 +140,9 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
-    async fetchReviews() {
+    async fetchReviews(page = 1) {
       try {
-        const res = await axiosPreset.get(`/service-reviews/${this.myBusiness.id}`);
+        const res = await axiosPreset.get(`/service-reviews/${this.myBusiness.id}?page=${page}`);
         this.serviceReviews = res.data;
         return res.data;
       } catch (err) {

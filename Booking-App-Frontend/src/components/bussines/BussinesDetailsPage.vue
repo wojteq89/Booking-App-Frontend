@@ -126,10 +126,17 @@
           <div class="review-item" v-for="review in reviews.reviews" :key="review.id">
             <div class="review-info">
               <p class="review-author">{{ review.client_name }}</p>
-              <p class="review-rating"><span v-for="i in review.rating">★</span></p>
-              <p class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</p>
+              <div class="review-right">
+                <p class="review-rating"><span v-for="i in review.rating">★</span></p>
+                <p class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</p>
+              </div>
             </div>
             <p class="review-text">{{ review.content }}</p>
+          </div>
+          <div class="pagination">
+            <button class="custom-button" @click="loadReviews(currentPage - 1)" :disabled="currentPage === 1">Poprzednia</button>
+            <span>Strona {{ currentPage }} z {{ lastPage }}</span>
+            <button class="custom-button" @click="loadReviews(currentPage + 1)" :disabled="currentPage === lastPage">Następna</button>
           </div>
         </div>
       </section>
@@ -207,6 +214,8 @@ const isOwner = ref(false);
 const currentImageIndex = ref(0);
 const todayIndex = (new Date().getDay() + 6) % 7;
 const isModalOpen = ref(false);
+const currentPage = ref(1);
+const lastPage = ref(null);
 
 const addReviewForm = ref({
   user_id: authStore.user.id,
@@ -360,6 +369,21 @@ watch(userReview, (newReview) => {
     editReviewForm.value.content = newReview.content || '';
   }
 }, { immediate: true });
+
+watch(() => reviews.value.last_page, (newVal) => {
+  if (newVal) lastPage.value = newVal;
+});
+
+const loadReviews = async (page = 1) => {
+  if (page < 1 || (lastPage.value && page > lastPage.value)) return;
+  try {
+    const data = await businessStore.fetchReviews(page);
+    currentPage.value = data.current_page;
+    lastPage.value = data.last_page;
+  } catch (e) {
+    console.error('Błąd podczas ładowania opinii:', e);
+  }
+};
 
 const starDisplay = computed(() => {
   const fullStars = Math.floor(reviews.value.average_rating);
@@ -649,6 +673,14 @@ const starDisplay = computed(() => {
 
 }
 
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .review-rating {
   display: flex;
   flex-direction: row;
@@ -722,6 +754,23 @@ const starDisplay = computed(() => {
   justify-content: space-between;
   align-items: center;
 }
+
+.review-author {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.review-text {
+  text-align: left;
+  margin: 0 20px 20px 20px;
+}
+
+.review-right {
+  display: flex;
+  gap: 20px
+}
+
+
 
 //------------- Second Column ------------------//
 .second-column {
