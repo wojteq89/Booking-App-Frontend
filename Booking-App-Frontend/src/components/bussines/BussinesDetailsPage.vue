@@ -130,8 +130,8 @@
             <option :value="2">2</option>
             <option :value="1">1</option>
           </select>
-          <p v-for="value in rating" :key="value" class="star">★</p>
-          <button class="custom-button" @click="businessStore.fetchReviews(1)">Wyczyść filtr</button>
+          <p v-if="rating" v-for="star in rating" :key="star" class="star">★</p>
+          <button class="custom-button" @click="clearFilter">Wyczyść filtr</button>
         </div>
         <div v-if="!reviews.reviews.length" class="user-reviews">
           <h2 class="section-name">Brak opinii</h2>
@@ -401,6 +401,11 @@ function onRatingChange() {
   businessStore.fetchReviews(1, rating.value);
 }
 
+function clearFilter() {
+  rating.value = null;
+  businessStore.fetchReviews(1);
+}
+
 const starDisplay = computed(() => {
   const fullStars = Math.floor(reviews.value.average_rating);
   const halfStar = reviews.value.average_rating % 1 >= 0.5;
@@ -450,7 +455,6 @@ const starDisplay = computed(() => {
   box-shadow: 0px 10px 10px 1px $shadow;
   border-radius: 10px;
   margin: 10px 10px 30px 10px;
-
 }
 
 .image-slider {
@@ -932,6 +936,12 @@ const starDisplay = computed(() => {
 
   .map-iframe {
     height: 400px;
+    box-shadow: none;
+  }
+
+  .photo-container {
+    margin: 0;
+    box-shadow: none;
   }
 }
 </style>
