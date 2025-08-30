@@ -7,9 +7,11 @@ import AddBusinessForm from '@/components/forms/AddBusinessForm.vue'
 import BussinesDetailsPage from '@/components/bussines/BussinesDetailsPage.vue'
 import ResetPasswordPage from '../components/auth/ResetPasswordPage.vue'
 import FavoritesListPage from '../components/favorites/FavoritesListPage.vue'
+import BrowsePage from '@/components/browsingPage/browsePage.vue'
 
 const routes = [
   { path: '/', component: HomePage },
+  { path: '/browse-page', component: BrowsePage },
   { path: '/settings', component: SettingsComp },
   { path: '/settings', component: SettingsComp },
   { path: '/login', component: LoginPage },

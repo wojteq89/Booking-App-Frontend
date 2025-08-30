@@ -1,6 +1,6 @@
 <template>
     <div style="width: 100%; margin-top: 20px;">
-        <h2 style="text-align: left;">Ulubione</h2>
+        <h2>Ulubione</h2>
         <div v-if="loading">
             <AppLogo class="app-logo" />
         </div>

@@ -13,8 +13,8 @@
                     wygodny.
                 </p>
                 <div class="button-group">
-                    <button class="custom-button">Znajdź usługi</button>
-                    <button class="custom-button">Zostań usługodawcą</button>
+                    <button class="custom-button" @click="goToOffers">Znajdź usługi</button>
+                    <button class="custom-button" @click="goToProvidersInfo">Zostań usługodawcą</button>
                 </div>
             </div>
         </section>
@@ -92,8 +92,31 @@
             </div>
         </section>
 
+        <section class="ready-to-start">
+            <h2>Gotowy, aby zacząć?</h2>
+            <p>Dołącz do tysięcy zadowolonych klientów i zarezerwuj swoją pierwszą usługę już dziś!</p>
+
+            <div class="button-group">
+                <button class="custom-button" @click="goToRegister">Zarejestruj się</button>
+                <button class="custom-button" @click="goToOffers">Przejrzyj oferty</button>
+            </div>
+        </section>
     </div>
 </template>
+
+<script setup>
+import router from '../../router';
+
+const goToRegister = () => {
+    router.push('/register');
+};
+const goToOffers = () => {
+    router.push('/browse-page');
+};
+const goToProvidersInfo = () => {
+    router.push('/providers-info');
+};
+</script>
 
 <style lang="scss" scoped>
 @use "@/styles/commonStyles.scss" as *;
@@ -102,6 +125,10 @@
     display: flex;
     flex-direction: column;
     gap: 50px;
+
+    h2 {
+        font-size: 2rem;
+    }
 }
 
 .hello-section {
@@ -132,11 +159,6 @@
         }
     }
 
-    .button-group {
-        display: flex;
-        gap: 20px;
-    }
-
     .image-section {
         flex: 1;
         display: flex;
@@ -164,13 +186,20 @@
     }
 }
 
+.button-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
 .popular-services {
     padding-top: 30px;
-    padding-bottom: 50px;
+    padding-bottom: 100px;
     background: linear-gradient(to right,
             transparent,
-            rgba($primary, 0.1) 10%,
-            rgba($primary, 0.1) 90%,
+            rgba($primary, 0.07) 10%,
+            rgba($primary, 0.07) 90%,
             transparent);
 
     .services-list {
@@ -197,7 +226,7 @@
 }
 
 .how-it-works {
-    padding: 30px 0px;
+    padding-bottom: 50px;
 
     .steps-list {
         display: flex;
@@ -235,9 +264,7 @@
 }
 
 .what-our-clients-say {
-    padding-top: 30px;
-    padding-bottom: 50px;
-    margin-bottom: 100px;
+    padding-bottom: 100px;
     background: linear-gradient(to right,
             transparent,
             rgba($primary, 0.1) 10%,
@@ -270,6 +297,16 @@
             font-weight: normal;
             color: $primary;
         }
+    }
+}
+
+.ready-to-start {
+    text-align: center;
+    margin-bottom: 100px;
+
+    p {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
     }
 }
 </style>

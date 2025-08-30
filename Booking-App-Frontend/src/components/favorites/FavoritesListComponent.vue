@@ -61,11 +61,10 @@ async function toggleFavorite() {
 
 .favorite-item {
     display: flex;
-    width: 75vw;
+    width: 70vw;
     height: 20vh;
     overflow: hidden;
     border: 2px solid $primary;
-    border-radius: 10px;
     margin-bottom: 20px;
     transition: all 0.3s ease;
 
@@ -82,7 +81,6 @@ async function toggleFavorite() {
 
 .fav-image {
     object-fit: cover;
-    border-radius: 8px;
     max-width: 250px;
 }
 
