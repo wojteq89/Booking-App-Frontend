@@ -38,7 +38,7 @@
   }
 
   const goToHomePage = () => {
-    router.push('/home')
+    router.push('/')
   }
 
   const goToBusinessForm = () => {

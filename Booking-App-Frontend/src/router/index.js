@@ -9,10 +9,11 @@ import ResetPasswordPage from '../components/auth/ResetPasswordPage.vue'
 import FavoritesListPage from '../components/favorites/FavoritesListPage.vue'
 
 const routes = [
+  { path: '/', component: HomePage },
+  { path: '/settings', component: SettingsComp },
   { path: '/settings', component: SettingsComp },
   { path: '/login', component: LoginPage },
   { path: '/register', component: RegisterPage },
-  { path: '/home', component: HomePage },
   { path: '/add-business-form', component: AddBusinessForm },
   { path: '/my-business', component: BussinesDetailsPage },
   { path: '/reset-password', component: ResetPasswordPage },
