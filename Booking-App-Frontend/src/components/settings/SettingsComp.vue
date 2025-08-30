@@ -5,6 +5,7 @@
       <h1>Witaj, {{ user ? user.first_name : 'User' }}</h1>
       <div class="button-container">
         <button class="func-button" @click="goToHomePage()">Przeglądaj</button>
+        <button class="func-button" @click="goToFavorites()">Ulubione</button>
         <button v-if="authStore.user.role == 'user'" class="func-button" @click="goToBusinessForm()">Dodaj swój biznes</button>
         <button v-if="authStore.user.role == 'owner'" class="func-button" @click="goToMyBusiness()">Edytuj swój biznes</button>
         <button class="func-button" @click="handleLogout()">Wyloguj</button>
@@ -46,6 +47,10 @@
 
   const goToMyBusiness = () => {
     router.push('/my-business')
+  }
+
+  const goToFavorites = () => {
+    router.push('/favorites')
   }
 </script>
 

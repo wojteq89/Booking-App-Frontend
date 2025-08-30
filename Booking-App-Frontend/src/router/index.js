@@ -6,6 +6,7 @@ import HomePage from '@/components/homePage/HomePage.vue'
 import AddBusinessForm from '@/components/forms/AddBusinessForm.vue'
 import BussinesDetailsPage from '@/components/bussines/BussinesDetailsPage.vue'
 import ResetPasswordPage from '../components/auth/ResetPasswordPage.vue'
+import FavoritesListPage from '../components/favorites/FavoritesListPage.vue'
 
 const routes = [
   { path: '/settings', component: SettingsComp },
@@ -15,6 +16,7 @@ const routes = [
   { path: '/add-business-form', component: AddBusinessForm },
   { path: '/my-business', component: BussinesDetailsPage },
   { path: '/reset-password', component: ResetPasswordPage },
+  { path: '/favorites', component: FavoritesListPage}
 ]
 
 const router = createRouter({

@@ -17,8 +17,10 @@
       <div class="title-container">
         <h1 class="business-name">{{ business.name }}</h1>
         <div class="business-add">
-          <button class="fav-button">
-            ❤️
+          <button @click="toggleFavorite()" class="fav-button">
+            <span>
+              <i :class="isFavorite ? 'fas fa-heart' : 'far fa-heart'"
+                :style="{ color: isFavorite ? '#e74c3c' : '' }"></i> </span>
           </button>
         </div>
       </div>
@@ -233,6 +235,7 @@ const isModalOpen = ref(false);
 const currentPage = ref(1);
 const lastPage = ref(null);
 const rating = ref(null);
+const isFavorite = ref(false);
 
 const addReviewForm = ref({
   user_id: authStore.user.id,
@@ -273,6 +276,17 @@ onMounted(async () => {
     }
   }
 });
+
+watch(
+  () => business.value?.id,
+  async (newId) => {
+    if (newId) {
+      const value = await businessStore.isFavorited(newId);
+      isFavorite.value = value.favorited;
+    }
+  },
+  { immediate: true }
+);
 
 function initLeafletMap(lat, lng) {
   const map = L.map('leaflet-map').setView([lat, lng], 14);
@@ -418,6 +432,11 @@ const starDisplay = computed(() => {
   };
 });
 
+async function toggleFavorite() {
+  const res = await businessStore.toggleFavorite(business.value.id);
+  isFavorite.value = res.favorited;
+}
+
 
 </script>
 
@@ -525,6 +544,7 @@ const starDisplay = computed(() => {
 
 .fav-button {
   margin-left: auto;
+  color: black;
   background-color: transparent;
   border: none;
   font-size: 22px;

@@ -1,12 +1,13 @@
 <template>
-<NavBar />
-<div class="router-view-container">
-    <router-view v-slot="{ Component }">
-        <Transition name="slide" mode="out-in">
-            <component :is="Component" />
-        </Transition>
-    </router-view>
-</div>
+    <NavBar />
+    <div class="router-view-container">
+        <router-view v-slot="{ Component }">
+            <Transition name="slide" mode="out-in">
+                <component :is="Component" />
+            </Transition>
+        </router-view>
+    </div>
+    <Footer />
 </template>
 
 <script>
@@ -18,10 +19,12 @@ import {
     onMounted
 } from 'vue'
 import NavBar from './components/common/NavBar.vue';
+import Footer from './components/common/Footer.vue';
 
 export default defineComponent({
     components: {
-        NavBar
+        NavBar,
+        Footer
     },
     setup() {
         const authStore = useAuthStore()
@@ -48,17 +51,23 @@ body {
 }
 
 #app {
+    display: flex;
+    flex-direction: column;
     margin: 0 auto;
     padding: 0;
 }
 
 .router-view-container {
+    flex: 1 0 auto;
+    margin: 0 auto;
+    max-width: 1280px;
+    min-height: 100vh;
     margin-top: 60px;
     background-color: $white;
     animation: slideInView 1s ease-out forwards;
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* align-items: center;  usuń jeśli nie chcesz centrować pionowo */
 }
 
 /* Animations */

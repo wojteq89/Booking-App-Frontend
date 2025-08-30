@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 import axiosPreset from '../axiosPreset';
 import router from '../router';
 import Swal from 'sweetalert2';
+import { icon } from 'leaflet';
+import axios from 'axios';
 
 export const useBusinessStore = defineStore('business', {
   state: () => ({
@@ -14,9 +16,13 @@ export const useBusinessStore = defineStore('business', {
       ratings_breakdown: [0, 0, 0, 0, 0],
       total: 0
     },
+    favorites: [],
   }),
 
   actions: {
+
+    // BUSINESS -------------------------
+
     async registerBusiness(formData) {
       try {
         const res = await axiosPreset.post('/business-add', formData);
@@ -81,6 +87,8 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
+    // SERVICES -------------------------
+
     async fetchServices() {
       try {
         const res = await axiosPreset.get('/service-items');
@@ -140,6 +148,8 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
+    // REVIEWS -------------------------
+
     async fetchReviews(page = 1, rating) {
       try {
         const res = await axiosPreset.get(`/service-reviews/${this.myBusiness.id}?page=${page}&rating=${rating}`);
@@ -187,6 +197,46 @@ export const useBusinessStore = defineStore('business', {
         throw err.response?.data;
       }
     },
+
+    // FAVORITES -------------------------
+
+    async fetchFavorites() {
+      try {
+        const res = await axiosPreset.get('/favorites');
+        this.favorites = res.data;
+        console.log('Wszystkie ulubione', res.data);
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się pobrać ulubionych usług' })
+        throw err.response?.data
+      }
+    },
+
+    async toggleFavorite(id) {
+      try {
+        const res = await axiosPreset.post(`/favorites/${id}/toggle`);
+        if (res.data.favorited === true) {
+          showAlert({ icon: 'success', title: 'Dodano do ulubionych' });
+        } else {
+          showAlert({ icon: 'success', title: 'Usunięto z ulubionych' });
+        }
+        this.isFavorited(id);
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Coś poszło nie tak' });
+        throw err.response?.data;
+      }
+    },
+
+    async isFavorited(id) {
+      try {
+        const res = await axiosPreset.get(`/favorites/${id}/is-favorite`);
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Coś poszło nie tak' })
+      }
+    },
+
   },
 });
 
