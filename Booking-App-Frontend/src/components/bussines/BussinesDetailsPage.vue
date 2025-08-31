@@ -199,7 +199,7 @@
 
       <section v-if="isOwner" class="owner-panel">
         <strong>Panel właściciela:</strong>
-        <button class="custom-button">Edytuj</button>
+        <button class="custom-button" @click="goToBusinessForm()" >Edytuj</button>
         <button class="custom-button delete-button" @click="deleteBusiness">Usuń</button>
       </section>
     </section>
@@ -220,7 +220,6 @@ import router from '../../router';
 import AddServiceFormModal from '@/components/forms/AddServiceFormModal.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
 
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
@@ -437,7 +436,9 @@ async function toggleFavorite() {
   isFavorite.value = res.favorited;
 }
 
-
+const goToBusinessForm = () => {
+  router.push('/add-business-form')
+}
 </script>
 
 

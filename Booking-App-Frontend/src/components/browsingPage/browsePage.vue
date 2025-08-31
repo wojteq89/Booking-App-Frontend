@@ -10,7 +10,7 @@
     </section>
 
     <section class="results-section">
-      <BrowseServiceItem v-for="i in 2" :key="i" />
+      <BrowseServiceItem v-for="i in 15" :key="i" />
     </section>
   </div>
 </template>
@@ -31,6 +31,10 @@ import BrowseServiceItem from './BrowseServiceItem.vue'
 }
 
 .search-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
     p {
         font-size: 1.2rem;
     }
@@ -59,7 +63,7 @@ import BrowseServiceItem from './BrowseServiceItem.vue'
 
     .search-wrapper {
         position: relative;
-        width: 100%;
+        width: 60%;
     }
 
     .search-icon {
@@ -75,6 +79,9 @@ import BrowseServiceItem from './BrowseServiceItem.vue'
 
 .results-section {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 30px;
     margin-top: 100px;
 }

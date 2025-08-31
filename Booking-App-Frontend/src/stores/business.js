@@ -46,6 +46,19 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
+    async updateBusiness(id, formData) {
+      try {
+        const res = await axiosPreset.post(`/business-update/${id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        showAlert({ icon: 'success', title: 'Biznes został zaktualizowany!' });
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się zaktualizować biznesu' });
+        throw err.response?.data;
+      }
+    },
+
     async fetchBusinessById(id) {
       try {
         const res = await axiosPreset.get(`/business/${id}`);

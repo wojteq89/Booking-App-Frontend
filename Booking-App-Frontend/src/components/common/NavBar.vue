@@ -121,7 +121,7 @@ export default defineComponent({
     margin-right: 15px;
     outline: none;
     border: none;
-    position: relative; // ważne, żeby ::after miał punkt odniesienia
+    position: relative;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 
@@ -129,7 +129,7 @@ export default defineComponent({
         content: "";
         position: absolute;
         left: 0;
-        bottom: -3px; // odsuwa linię od tekstu
+        bottom: -3px;
         width: 0;
         height: 3px;
         background-color: $primary;
@@ -137,7 +137,7 @@ export default defineComponent({
     }
 
     &:hover {
-        background-color: transparent; // zostaje bez tła
+        background-color: transparent;
         color: $primary;
 
         &::after {
