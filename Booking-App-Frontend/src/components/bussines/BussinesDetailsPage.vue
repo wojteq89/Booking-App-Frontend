@@ -194,12 +194,12 @@
 
       <div class="category">
         <strong>Kategoria:</strong>
-        <p>{{ business.category }}</p>
+        <p>{{ categoryName }}</p>
       </div>
-
+      
       <section v-if="isOwner" class="owner-panel">
         <strong>Panel właściciela:</strong>
-        <button class="custom-button" @click="goToBusinessForm()" >Edytuj</button>
+        <button class="custom-button" @click="goToBusinessForm()">Edytuj</button>
         <button class="custom-button delete-button" @click="deleteBusiness">Usuń</button>
       </section>
     </section>
@@ -439,6 +439,18 @@ async function toggleFavorite() {
 const goToBusinessForm = () => {
   router.push('/add-business-form')
 }
+
+const categoryName = computed(() => {
+  if (!business.value || !business.value.category_id || !businessStore.categories.length) {
+    return 'Brak kategorii';
+  }
+
+  const foundCategory = businessStore.categories.find(
+    (cat) => cat.id === business.value.category_id
+  );
+
+  return foundCategory ? foundCategory.name : 'Brak kategorii';
+});
 </script>
 
 

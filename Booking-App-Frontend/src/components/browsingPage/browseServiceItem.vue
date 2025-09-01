@@ -1,18 +1,29 @@
 <template>
     <div class="service-item-card">
         <div class="image-section">
-            <img src="@/assets/Graphics/ocw3a3ngdun51.webp" alt="Service Image" class="service-image" />
+            <img :src="business.images && JSON.parse(business.images).length > 0
+                ? `http://127.0.0.1:8000${JSON.parse(business.images)[0]}`
+                : defaultImage" :alt="business.name" class="service-image" />
         </div>
         <div class="info-section">
-            <h3 class="service-title">12345</h3>
-            <p class="service-description">Opis usługi</p>
-            <p class="service-price">From 255435</p>
+            <h3 class="service-title">{{ business.name }}</h3>
+            <p class="service-description">{{ business.description }}</p>
+            <p class="service-price">Kategoria: {{ business.category }}</p>
             <button class="book-now-button">Book Now</button>
         </div>
     </div>
 </template>
 
 <script setup>
+import { defineProps } from 'vue';
+import defaultImage from '@/assets/Graphics/image_placeholder.png';
+
+const props = defineProps({
+    business: {
+        type: Object,
+        required: true,
+    },
+});
 </script>
 
 <style lang="scss" scoped>
@@ -26,11 +37,10 @@
 
     .image-section {
         flex: 1;
-        min-width: 150px;
-
+        
         .service-image {
-            max-width: 300px;
-            height: 100%;
+            width: 250px;
+            height: 175px;
             object-fit: cover;
         }
     }

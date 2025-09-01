@@ -15,6 +15,9 @@ import {
     useAuthStore
 } from '@/stores/auth'
 import {
+    useBusinessStore
+} from '@/stores/business'
+import {
     defineComponent,
     onMounted
 } from 'vue'
@@ -28,11 +31,13 @@ export default defineComponent({
     },
     setup() {
         const authStore = useAuthStore()
+        const businessStore = useBusinessStore()
 
         onMounted(() => {
             if (authStore.token) {
                 authStore.checkTokenExpiry()
                 authStore.getUser()
+                businessStore.fetchCategories()
             }
         })
 
@@ -67,7 +72,6 @@ body {
     animation: slideInView 1s ease-out forwards;
     display: flex;
     justify-content: center;
-    /* align-items: center;  usuń jeśli nie chcesz centrować pionowo */
 }
 
 /* Animations */

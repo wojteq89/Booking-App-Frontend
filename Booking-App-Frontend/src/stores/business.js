@@ -9,7 +9,9 @@ export const useBusinessStore = defineStore('business', {
   state: () => ({
     myBusiness: null,
     selectedBusiness: null,
+    businesses: [],
     serviceItems: [],
+    categories: [],
     serviceReviews: {
       reviews: [],
       average_rating: 0,
@@ -17,6 +19,11 @@ export const useBusinessStore = defineStore('business', {
       total: 0
     },
     favorites: [],
+    pagination: {
+      current_page: 1,
+      last_page: 1,
+      total: 0,
+    },
   }),
 
   actions: {
@@ -56,6 +63,30 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się zaktualizować biznesu' });
         throw err.response?.data;
+      }
+    },
+
+    async fetchAllBusinesses(page = 1, category = '', search = '') {
+      try {
+        const params = {
+          page: page,
+          ...(category && { category: category }),
+          ...(search && { search: search })
+        };
+
+        const res = await axiosPreset.get('/businesses-all', { params: params });
+        this.businesses = res.data.data;
+        this.pagination.current_page = res.data.current_page;
+        this.pagination.last_page = res.data.last_page;
+        this.pagination.total = res.data.total;
+
+      } catch (err) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Wystąpił błąd podczas pobierania usług.',
+          text: 'Spróbuj odświeżyć stronę.'
+        });
+        throw err;
       }
     },
 
@@ -250,6 +281,19 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
+    // Categories -------------------------
+
+    async fetchCategories() {
+      try {
+        const res = await axiosPreset.get('/categories');
+        this.categories = res.data.categories;
+        console.log('Kategorie', this.categories);
+        return res.data.categories;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się pobrać kategorii' });
+        throw err.response?.data;
+      }
+    },
   },
 });
 

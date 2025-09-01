@@ -5,7 +5,12 @@
       <h2 class="title">Dodaj swój biznes</h2>
       <form @submit.prevent="registerBusiness" class="custom-form" enctype="multipart/form-data">
         <input class="input-field" v-model="form.name" placeholder="Dodaj nazwę biznesu" />
-        <input class="input-field" v-model="form.category" placeholder="Wybierz kategorię" />
+        <select v-model="form.category_id" class="input-field">
+          <option value="">Wybierz kategorię</option>
+          <option v-for="category in business.categories" :key="category.id" :value="category.id">
+            {{ category.name }}
+          </option>
+        </select>
         <input class="input-field" v-model="form.location" placeholder="Dodaj adres" />
         <input class="input-field" v-model="form.description" placeholder="Dodaj opis" />
 
@@ -37,8 +42,14 @@
       <form @submit.prevent="updateBusiness" class="custom-form" enctype="multipart/form-data">
         <input class="input-field" v-model="form.name"
           :placeholder="business.myBusiness.name || 'Dodaj nazwę biznesu'" />
-        <input class="input-field" v-model="form.category"
-          :placeholder="business.myBusiness.category || 'Wybierz kategorię'" />
+        <select v-model="form.category_id" class="input-field">
+          <option value="">
+            {{ business.categories[business.myBusiness.category_id ? business.myBusiness.category_id - 1 : 0].name }}
+          </option>
+          <option v-for="category in business.categories" :key="category.id" :value="category.id">
+            {{ category.name }}
+          </option>
+        </select>
         <input class="input-field" v-model="form.location"
           :placeholder="business.myBusiness.location || 'Dodaj adres'" />
         <input class="input-field" v-model="form.description"
@@ -89,7 +100,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, watchEffect } from 'vue'
+import { reactive, computed, watchEffect, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useBusinessStore } from '@/stores/business'
 
@@ -100,12 +111,16 @@ const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 
 
 const form = reactive({
   name: '',
-  category: '',
+  category_id: '',
   location: '',
   description: '',
   newImages: [],
   existingImages: []
 })
+
+onMounted(() => {
+  business.fetchCategories();
+});
 
 const openingHours = reactive(
   Object.fromEntries(daysOfWeek.map(day => [day, { open: false, from: '08:00', to: '16:00' }]))
@@ -124,7 +139,7 @@ const parsedImages = computed(() => {
 watchEffect(() => {
   if (business.myBusiness) {
     form.name = business.myBusiness.name || ''
-    form.category = business.myBusiness.category || ''
+    form.category_id = business.myBusiness.category?.id || '';
     form.location = business.myBusiness.location || ''
     form.description = business.myBusiness.description || ''
     form.existingImages = parsedImages.value
@@ -166,12 +181,12 @@ const generateOpeningHoursString = () => {
 const registerBusiness = async () => {
   const data = new FormData();
   data.append('name', form.name);
-  data.append('category', form.category);
+  data.append('category_id', form.category_id);
   data.append('location', form.location);
   data.append('description', form.description);
   data.append('opening_hours', generateOpeningHoursString());
 
-  form.images.forEach((file, index) => {
+  form.newImages.forEach(file => {
     data.append(`images[]`, file);
   });
 
@@ -181,7 +196,7 @@ const registerBusiness = async () => {
 const updateBusiness = async () => {
   const data = new FormData()
   data.append('name', form.name)
-  data.append('category', form.category)
+  data.append('category_id', form.category_id);
   data.append('location', form.location)
   data.append('description', form.description)
   data.append('opening_hours', generateOpeningHoursString())
@@ -311,6 +326,7 @@ input[type="time"] {
 
 .service-delete-button {
   width: 60%;
+
   &:hover {
     background-color: $red;
     color: $white;

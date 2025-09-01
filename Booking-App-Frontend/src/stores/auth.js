@@ -73,7 +73,6 @@ export const useAuthStore = defineStore('auth', {
         }
 
         this.isLoggedIn = true;
-        //console.log('Token is valid:', this.isLoggedIn);
       } catch (err) {
         console.error('Token expiry check error:', err);
         this.logout();

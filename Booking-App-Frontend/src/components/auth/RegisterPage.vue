@@ -11,7 +11,7 @@
         <p>Hasło musi mieć conajmniej 6 znaków</p>
         <input class="input-field" v-model="form.city" placeholder="Miasto" />
         <input class="input-field" v-model="form.phone_number" placeholder="Numer telefonu" />
-        <button type="submit" class="custom-button">Register</button>
+        <button type="submit" class="custom-button">Zarejestruj się</button>
       </form>
       <router-link to="/login">Masz już konto? Zaloguj się</router-link>
       <router-link to="/reset-password">Nie pamiętam hasła</router-link>

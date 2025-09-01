@@ -13,18 +13,20 @@ const routes = [
   { path: '/', component: HomePage },
   { path: '/browse-page', component: BrowsePage },
   { path: '/settings', component: SettingsComp },
-  { path: '/settings', component: SettingsComp },
   { path: '/login', component: LoginPage },
   { path: '/register', component: RegisterPage },
   { path: '/add-business-form', component: AddBusinessForm },
   { path: '/my-business', component: BussinesDetailsPage },
   { path: '/reset-password', component: ResetPasswordPage },
-  { path: '/favorites', component: FavoritesListPage}
+  { path: '/favorites', component: FavoritesListPage }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 }
+  },
 })
 
 export default router
