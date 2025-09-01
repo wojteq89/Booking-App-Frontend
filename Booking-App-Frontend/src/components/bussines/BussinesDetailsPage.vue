@@ -196,7 +196,6 @@
         <strong>Kategoria:</strong>
         <p>{{ categoryName }}</p>
       </div>
-      
       <section v-if="isOwner" class="owner-panel">
         <strong>Panel właściciela:</strong>
         <button class="custom-button" @click="goToBusinessForm()">Edytuj</button>
@@ -223,7 +222,7 @@ import 'leaflet/dist/leaflet.css';
 
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
-const { myBusiness: business } = storeToRefs(businessStore);
+const { selectedBusiness: business } = storeToRefs(businessStore);
 const { serviceItems: services } = storeToRefs(businessStore);
 const { serviceReviews: reviews } = storeToRefs(businessStore);
 
@@ -245,7 +244,13 @@ const addReviewForm = ref({
 
 onMounted(async () => {
   try {
-    await businessStore.fetchMyBusiness();
+    console.log(router.currentRoute.value.name);
+    if (router.currentRoute.value.name === 'my-business') {
+      await businessStore.fetchMyBusiness();
+    } else {
+      await businessStore.fetchBusinessById(router.currentRoute.value.params.id);
+    }
+
     await businessStore.fetchServices();
     await businessStore.fetchReviews(1);
     checkIsOwner();

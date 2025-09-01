@@ -46,6 +46,7 @@ export const useBusinessStore = defineStore('business', {
       try {
         const res = await axiosPreset.get('/my-business');
         this.myBusiness = res.data.business;
+        this.selectedBusiness = res.data.business;
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać Twojej usługi' });
         router.push('/settings');
@@ -196,7 +197,7 @@ export const useBusinessStore = defineStore('business', {
 
     async fetchReviews(page = 1, rating) {
       try {
-        const res = await axiosPreset.get(`/service-reviews/${this.myBusiness.id}?page=${page}&rating=${rating}`);
+        const res = await axiosPreset.get(`/service-reviews/${this.selectedBusiness.id}?page=${page}&rating=${rating}`);
         this.serviceReviews = res.data;
         return res.data;
       } catch (err) {
@@ -208,7 +209,7 @@ export const useBusinessStore = defineStore('business', {
     async addReview(formDataRef) {
       try {
         const formData = { ...formDataRef.value };
-        formData.service_id = this.myBusiness.id;
+        formData.service_id = this.selectedBusiness.id;
         if (!formData.rating || !formData.content) {
           showAlert({ icon: 'warning', title: 'Wszystkie pola są wymagane!' });
           return;

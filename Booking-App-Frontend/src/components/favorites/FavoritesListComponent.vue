@@ -4,7 +4,7 @@
         <div class="fav-info">
             <p class="title"><span>{{ favorite.name }}</span></p>
             <p class="localization"><span></span> {{ favorite.location }}</p>
-            <p class="category"><span></span> {{ favorite.category }}</p>
+            <p class="category"><span></span> {{ favorite.category.name }}</p>
             <p class="desc"><span>Opis: </span> {{ favorite.description }}</p>
         </div>
         <div class="buttons">
@@ -35,7 +35,6 @@ const props = defineProps({
     }
 });
 const businessStore = useBusinessStore();
-const { myBusiness: business } = storeToRefs(businessStore);
 
 const isFavorite = ref(!!props.favorite.is_favorite);
 
@@ -81,11 +80,14 @@ async function toggleFavorite() {
 
 .fav-image {
     object-fit: cover;
+    box-shadow: 0px 0px 15px $shadow;
     max-width: 250px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .fav-info {
-    margin-left: 10px;
+    margin-left: 20px;
     margin-right: 10px;
     width: 100%;
     display: flex;

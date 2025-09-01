@@ -16,7 +16,12 @@ const routes = [
   { path: '/login', component: LoginPage },
   { path: '/register', component: RegisterPage },
   { path: '/add-business-form', component: AddBusinessForm },
-  { path: '/my-business', component: BussinesDetailsPage },
+  { path: '/my-business', component: BussinesDetailsPage, name: 'my-business' },
+  {
+    path: '/business/:id', component: BussinesDetailsPage,
+    name: 'business-details',
+    props: true
+  },
   { path: '/reset-password', component: ResetPasswordPage },
   { path: '/favorites', component: FavoritesListPage }
 ]

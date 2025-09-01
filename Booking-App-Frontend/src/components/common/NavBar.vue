@@ -193,6 +193,7 @@ export default defineComponent({
 
 .hamburger-menu {
     display: none;
+    outline: none;
     background: transparent;
     border: none;
     cursor: pointer;
