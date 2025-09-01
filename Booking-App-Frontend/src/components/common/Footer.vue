@@ -3,16 +3,18 @@
     <div class="footer-content">
       <div class="footer-brand">
         <div>
-            <AppLogo class="app-logo" />
+          <AppLogo class="app-logo" />
         </div>
         <p class="footer-desc">Rezerwuj usługi szybko i wygodnie!</p>
       </div>
-      <ul class="footer-links">
-        <li><a href="#">O nas</a></li>
-        <li><a href="#">Kontakt</a></li>
-        <li><a href="#">Regulamin</a></li>
-        <li><a href="#">Polityka prywatności</a></li>
-      </ul>
+      <div>
+        <ul class="footer-links">
+          <li><a href="#">O nas</a></li>
+          <li><a href="#">Kontakt</a></li>
+          <li><a href="#">Regulamin</a></li>
+          <li><a href="#">Polityka prywatności</a></li>
+        </ul>
+      </div>
     </div>
     <div class="footer-bottom">
       &copy; {{ new Date().getFullYear() }} TermiNow. Wszelkie prawa zastrzeżone.
@@ -40,12 +42,9 @@ import AppLogo from '@/components/common/AppLogo.vue';
   .footer-content {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    width: 90%;
-    max-width: 1200px;
     margin-bottom: 12px;
 
-    @media (max-width: 700px) {
+    @media (max-width: 768px) {
       flex-direction: column;
       align-items: center;
       text-align: center;
@@ -61,6 +60,7 @@ import AppLogo from '@/components/common/AppLogo.vue';
       background-color: white;
       padding: 20px;
     }
+
     .footer-desc {
       font-size: 1rem;
       margin-top: 4px;
@@ -71,15 +71,18 @@ import AppLogo from '@/components/common/AppLogo.vue';
   .footer-links {
     list-style: none;
     display: flex;
-    flex-direction: row;
-    gap: 24px;
+    flex-direction: column;
+    text-align: left;
+    gap: 15px;
     padding: 0;
     margin: 0;
+    margin-left: 30px;
 
     li a {
       color: $white;
       text-decoration: none;
       transition: color 0.2s;
+
       &:hover {
         color: red;
         text-decoration: underline;
@@ -89,6 +92,8 @@ import AppLogo from '@/components/common/AppLogo.vue';
     @media (max-width: 700px) {
       flex-direction: column;
       gap: 8px;
+      margin: 0;
+      text-align: center;
     }
   }
 
@@ -98,7 +103,7 @@ import AppLogo from '@/components/common/AppLogo.vue';
     font-size: 0.95rem;
     color: $white;
     margin-top: 8px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-top: 8px;
   }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="main">
+    <div class="main" @click="goToHome()">
         <img class="callendar-icon" src="../../assets/Graphics/logo_callendar_TermiNow.svg" alt="logo">
         <div class="inscription-container">
             <img class="inscription" src="../../assets/Graphics/logo_inscription_TermiNow.svg" alt="logo">
@@ -7,8 +7,13 @@
     </div>
 </template>
 
-<script scoped>
+<script setup>
+import { useRouter } from 'vue-router'
 
+const goToHome = () => {
+    const router = useRouter();
+    router.push('/');
+};
 </script>
 
 <style scoped>
