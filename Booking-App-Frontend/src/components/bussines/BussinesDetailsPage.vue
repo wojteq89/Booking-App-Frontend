@@ -34,11 +34,11 @@
           </div>
           <div class="service-button-row">
             <button class="service-buy-button custom-button" @click="makeAnAppointment">Umów</button>
-            <button v-if="isOwner" class="service-delete-button custom-button"
+            <button v-if="isOwner && isMyBusinessRoute" class="service-delete-button custom-button"
               @click="deleteService(service.id)">Usuń</button>
           </div>
         </div>
-        <button v-if="isOwner" class="add-service-button" @click="addService">
+        <button v-if="isOwner && isMyBusinessRoute" class="add-service-button" @click="addService">
           +
           <span class="add-service-button-text">Dodaj usługę</span>
         </button>
@@ -196,7 +196,7 @@
         <strong>Kategoria:</strong>
         <p>{{ categoryName }}</p>
       </div>
-      <section v-if="isOwner" class="owner-panel">
+      <section v-if="isOwner && isMyBusinessRoute" class="owner-panel">
         <strong>Panel właściciela:</strong>
         <button class="custom-button" @click="goToBusinessForm()">Edytuj</button>
         <button class="custom-button delete-button" @click="deleteBusiness">Usuń</button>
@@ -234,6 +234,7 @@ const currentPage = ref(1);
 const lastPage = ref(null);
 const rating = ref(null);
 const isFavorite = ref(false);
+const isMyBusinessRoute = computed(() => router.currentRoute.value.name === 'my-business');
 
 const addReviewForm = ref({
   user_id: authStore.user.id,
@@ -245,7 +246,7 @@ const addReviewForm = ref({
 onMounted(async () => {
   try {
     console.log(router.currentRoute.value.name);
-    if (router.currentRoute.value.name === 'my-business') {
+    if (isMyBusinessRoute) {
       await businessStore.fetchMyBusiness();
     } else {
       await businessStore.fetchBusinessById(router.currentRoute.value.params.id);
@@ -312,8 +313,9 @@ const deleteBusiness = async () => {
 
 const checkIsOwner = () => {
   try {
-    isOwner.value = authStore.user.id === businessStore.myBusiness.user_id;
+    isOwner.value = authStore.user.id === businessStore.selectedBusiness.user_id;
   } catch (err) {
+    isOwner.value = false;
     console.error('Błąd podczas sprawdzania właściciela:', err);
   }
 };

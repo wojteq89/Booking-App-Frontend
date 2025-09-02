@@ -10,7 +10,7 @@
             <p class="service-price">Kategoria: {{ businessStore.categories[business.category_id].name }}</p>
             <p class="service-description">{{ shortDescription }}</p>
         </div>
-        <button class="custom-button details-button" @click="goToDetails()">Zobacz-szczegóły</button>
+        <button class="custom-button details-button" @click="goToDetails()">Zobacz szczegóły</button>
     </div>
 </template>
 

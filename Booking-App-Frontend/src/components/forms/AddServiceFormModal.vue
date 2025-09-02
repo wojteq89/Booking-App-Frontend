@@ -10,6 +10,17 @@
                 <input class="input-field" placeholder="Czas trwania (minuty)" v-model="formData.duration" />
                 <input class="input-field" type="number" step="0.01" placeholder="Cena (np: 10.99)"
                     v-model="formData.price" />
+
+                <div class="color-picker-container">
+                    <p>Wybierz kolor do kalendarza:</p>
+                    <div class="colors-wrapper">
+                        <div v-for="colorOption in colorOptions" :key="colorOption"
+                            :class="['color-box', { 'selected': formData.color === colorOption }]"
+                            :style="{ backgroundColor: colorOption }" @click="selectColor(colorOption)">
+                        </div>
+                    </div>
+                </div>
+
                 <button class="custom-button" type="submit">Dodaj usługę</button>
             </form>
             <button class="custom-button cancel-button" @click="$emit('close')">Anuluj</button>
@@ -20,7 +31,6 @@
     </div>
 </template>
 
-
 <script setup>
 import { onMounted, reactive, ref, onUnmounted } from 'vue';
 import { useBusinessStore } from '@/stores/business';
@@ -30,12 +40,17 @@ const businessStore = useBusinessStore();
 const { myBusiness: business } = storeToRefs(businessStore);
 const isMobile = ref(false);
 
+const colorOptions = [
+    'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'teal', 'gray', 'black'
+];
+
 const formData = reactive({
     service_id: business.value.id,
     name: '',
     description: '',
     duration: '',
     price: '',
+    color: null,
 });
 
 onMounted(async () => {
@@ -57,6 +72,10 @@ const handleSubmit = async () => {
     } catch (error) {
         console.error('Error adding service:', error);
     }
+};
+
+const selectColor = (color) => {
+    formData.color = color;
 };
 
 const checkIsMobile = () => {
@@ -134,6 +153,40 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+.color-picker-container {
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.color-picker-container p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.colors-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.color-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.color-box:hover {
+    transform: scale(1.1);
+}
+
+.color-box.selected {
+    transform: scale(1.3);
 }
 
 @media screen and (max-width: 768px) {

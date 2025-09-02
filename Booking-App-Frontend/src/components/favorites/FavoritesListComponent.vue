@@ -15,7 +15,7 @@
                     :style="{ color: isFavorite ? '#e74c3c' : '' }">
                 </i>
             </button>
-            <button @click="toggleFavorite()" class="fav-button">
+            <button @click="goToDetails()" class="fav-button">
                 <span class="button-text"></span>
                 <i class="fas fa-eye"></i>
             </button>
@@ -27,6 +27,8 @@
 import { computed, ref, watch } from 'vue';
 import { useBusinessStore } from '@/stores/business';
 import { storeToRefs } from 'pinia';
+import router from '../../router';
+
 
 const props = defineProps({
     favorite: {
@@ -53,6 +55,10 @@ async function toggleFavorite() {
     const res = await businessStore.toggleFavorite(props.favorite.id);
     isFavorite.value = res.favorited;
 }
+
+const goToDetails = () => {
+    router.push({ name: 'business-details', params: { id: props.favorite.id } });
+};
 </script>
 
 <style lang="scss" scoped>
@@ -158,6 +164,9 @@ async function toggleFavorite() {
     .fav-image {
         max-width: 100%;
         max-height: 200px;
+        margin-bottom: 10px;
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
     }
 
     .buttons {

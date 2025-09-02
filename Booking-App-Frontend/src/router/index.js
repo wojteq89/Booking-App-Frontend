@@ -8,6 +8,7 @@ import BussinesDetailsPage from '@/components/bussines/BussinesDetailsPage.vue'
 import ResetPasswordPage from '../components/auth/ResetPasswordPage.vue'
 import FavoritesListPage from '../components/favorites/FavoritesListPage.vue'
 import BrowsePage from '@/components/browsingPage/browsePage.vue'
+import TestPage from '@/components/testPages/testPage.vue'
 
 const routes = [
   { path: '/', component: HomePage },
@@ -23,7 +24,8 @@ const routes = [
     props: true
   },
   { path: '/reset-password', component: ResetPasswordPage },
-  { path: '/favorites', component: FavoritesListPage }
+  { path: '/favorites', component: FavoritesListPage },
+  {path: '/test-page', component: TestPage}
 ]
 
 const router = createRouter({

@@ -82,11 +82,7 @@ export const useBusinessStore = defineStore('business', {
         this.pagination.total = res.data.total;
 
       } catch (err) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Wystąpił błąd podczas pobierania usług.',
-          text: 'Spróbuj odświeżyć stronę.'
-        });
+        showAlert({ icon: 'error', title: 'Wystąpił błąd podczas pobierania usług' });
         throw err;
       }
     },
@@ -136,7 +132,7 @@ export const useBusinessStore = defineStore('business', {
 
     async fetchServices() {
       try {
-        const res = await axiosPreset.get('/service-items');
+        const res = await axiosPreset.get(`/service-items/${this.selectedBusiness.id}`);
         this.serviceItems = res.data.services;
         return res.data;
       } catch (err) {

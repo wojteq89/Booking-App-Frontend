@@ -4,7 +4,7 @@
     <div v-if="isLoggedIn">
       <h1>Witaj, {{ user ? user.first_name : 'User' }}</h1>
       <div class="button-container">
-        <button class="func-button" @click="goToHomePage()">Przeglądaj</button>
+        <button class="func-button" @click="goToHomeSearch()">Przeglądaj</button>
         <button class="func-button" @click="goToFavorites()">Ulubione</button>
         <button v-if="authStore.user.role == 'user'" class="func-button" @click="goToBusinessForm()">Dodaj swój biznes</button>
         <button v-if="authStore.user.role == 'owner'" class="func-button" @click="goToMyBusiness()">Edytuj swój biznes</button>
@@ -15,7 +15,7 @@
       <h1>Zaloguj się ponownie</h1>
       <div class="button-container">
         <button class="func-button" @click="goToLogin()">Zaloguj się ponownie</button>
-        <button class="func-button" @click="goToHomePage()">Przeglądaj</button>
+        <button class="func-button" @click="goToHomeSearch()">Przeglądaj</button>
       </div>
     </div>
   </div>
@@ -37,8 +37,8 @@
     router.push('/login')
   }
 
-  const goToHomePage = () => {
-    router.push('/')
+  const goToHomeSearch = () => {
+    router.push('/browse-page')
   }
 
   const goToBusinessForm = () => {
