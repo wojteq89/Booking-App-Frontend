@@ -246,9 +246,9 @@ const addReviewForm = ref({
 onMounted(async () => {
   try {
     console.log(router.currentRoute.value.name);
-    if (isMyBusinessRoute) {
+    if (isMyBusinessRoute.value) {
       await businessStore.fetchMyBusiness();
-    } else {
+    } else if (router.currentRoute.value.name === 'business-details') {
       await businessStore.fetchBusinessById(router.currentRoute.value.params.id);
     }
 
@@ -362,7 +362,7 @@ const deleteService = async (id) => {
 };
 
 const makeAnAppointment = () => {
-  // Implementacja logiki umawiania wizyty
+  router.push('/test-page');
 };
 
 const addReview = async () => {
