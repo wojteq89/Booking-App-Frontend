@@ -13,6 +13,8 @@ export const useBusinessStore = defineStore('business', {
     serviceItems: [],
     categories: [],
     isLoading: false,
+    selectedServiceItem: null,
+    availableSlots: [],
     serviceReviews: {
       reviews: [],
       average_rating: 0,
@@ -330,6 +332,31 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać kategorii' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    // Appointments -------------------------
+
+    setSelectedServiceItem(item) {
+      this.selectedServiceItem = item
+      console.log('Wybrana usługa', this.selectedServiceItem)
+    },
+
+    async fetchAppointmentsSlots(serviceId, date) {
+      this.isLoading = true;
+      try {
+        const res = await axiosPreset.get(`/appointments/slots/${serviceId}`, {
+          params: {
+            date: date,
+            service_item_id: serviceId,
+          }
+        });
+        this.availableSlots = res.data.available_slots;
+        console.log('Dostępne terminy', this.availableSlots);
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się pobrać dostępnych terminów' });
       } finally {
         this.isLoading = false;
       }

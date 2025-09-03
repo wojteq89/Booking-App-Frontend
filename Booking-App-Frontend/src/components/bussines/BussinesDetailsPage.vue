@@ -36,7 +36,7 @@
             <h3 class="service-time">{{ service.duration }}min</h3>
           </div>
           <div class="service-button-row">
-            <button class="service-buy-button custom-button" @click="makeAnAppointment">Umów</button>
+            <button class="service-buy-button custom-button" @click="makeAnAppointment(service)">Umów</button>
             <button v-if="isOwner && isMyBusinessRoute" class="service-delete-button custom-button"
               @click="deleteService(service.id)">Usuń</button>
           </div>
@@ -251,7 +251,6 @@ onMounted(async () => {
     } else if (router.currentRoute.value.name === 'business-details') {
       await businessStore.fetchBusinessById(router.currentRoute.value.params.id);
     }
-
     await businessStore.fetchServices();
     await businessStore.fetchReviews(1);
     checkIsOwner();
@@ -361,9 +360,12 @@ const deleteService = async (id) => {
   }
 };
 
-const makeAnAppointment = () => {
-  router.push('/test-page');
-};
+const makeAnAppointment = async (service) => {
+  const today = new Date().toISOString().slice(0, 10)
+  await businessStore.setSelectedServiceItem(service)
+  await businessStore.fetchAppointmentsSlots(service.id, today)
+  router.push('/test-page')
+}
 
 const addReview = async () => {
   try {
