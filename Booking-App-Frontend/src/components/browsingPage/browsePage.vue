@@ -10,9 +10,14 @@
     </section>
 
     <section class="results-section">
-      <div v-if="businessStore.businesses.length === 0" class="no-results">
+      <div v-if="businessStore.isLoading" class="loading-state">
+        <Loader />
+      </div>
+
+      <div v-else-if="businessStore.businesses.length === 0" class="no-results">
         <p>Brak wyników wyszukiwania.</p>
       </div>
+
       <BrowseServiceItem v-else v-for="business in businessStore.businesses" :key="business.id" :business="business" />
     </section>
   </div>
@@ -22,23 +27,25 @@
 import { onMounted, ref, watch } from 'vue';
 import { useBusinessStore } from '@/stores/business';
 import BrowseServiceItem from './BrowseServiceItem.vue';
+import Loader from '../common/Loader.vue';
 
 const businessStore = useBusinessStore();
 
 const searchText = ref('');
-
 let searchTimeout = null;
 
 watch(searchText, (newSearchTerm) => {
   clearTimeout(searchTimeout);
 
   searchTimeout = setTimeout(() => {
+
     businessStore.fetchAllBusinesses(1, '', newSearchTerm);
   }, 500);
 });
 
-onMounted(() => {
-  businessStore.fetchAllBusinesses();
+onMounted(async () => {
+  await businessStore.fetchCategories();
+  await businessStore.fetchAllBusinesses();
 });
 </script>
 

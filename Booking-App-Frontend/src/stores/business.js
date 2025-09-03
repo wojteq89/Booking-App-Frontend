@@ -12,6 +12,7 @@ export const useBusinessStore = defineStore('business', {
     businesses: [],
     serviceItems: [],
     categories: [],
+    isLoading: false,
     serviceReviews: {
       reviews: [],
       average_rating: 0,
@@ -31,6 +32,7 @@ export const useBusinessStore = defineStore('business', {
     // BUSINESS -------------------------
 
     async registerBusiness(formData) {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.post('/business-add', formData);
         showAlert({ icon: 'success', title: 'Twój biznes został pomyślnie zarejestrowany!' });
@@ -39,10 +41,13 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się zarejestrować biznesu' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     async fetchMyBusiness() {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.get('/my-business');
         this.myBusiness = res.data.business;
@@ -51,10 +56,13 @@ export const useBusinessStore = defineStore('business', {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać Twojej usługi' });
         router.push('/settings');
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     async updateBusiness(id, formData) {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.post(`/business-update/${id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -64,10 +72,13 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się zaktualizować biznesu' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     async fetchAllBusinesses(page = 1, category = '', search = '') {
+      this.isLoading = true;
       try {
         const params = {
           page: page,
@@ -84,16 +95,21 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Wystąpił błąd podczas pobierania usług' });
         throw err;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     async fetchBusinessById(id) {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.get(`/business/${id}`);
         this.selectedBusiness = res.data.business;
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie znaleziono usługi' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -113,6 +129,7 @@ export const useBusinessStore = defineStore('business', {
       });
 
       if (confirmation.isConfirmed) {
+        this.isLoading = true;
         try {
           const id = this.myBusiness.id;
           const res = await axiosPreset.delete(`/business-delete/${id}`);
@@ -122,6 +139,8 @@ export const useBusinessStore = defineStore('business', {
         } catch (err) {
           showAlert({ icon: 'error', title: 'Nie udało się usunąć biznesu' });
           throw err.response?.data;
+        } finally {
+          this.isLoading = false;
         }
       } else {
         showAlert({ icon: 'info', title: 'Usunięcie anulowane' });
@@ -131,6 +150,7 @@ export const useBusinessStore = defineStore('business', {
     // SERVICES -------------------------
 
     async fetchServices() {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.get(`/service-items/${this.selectedBusiness.id}`);
         this.serviceItems = res.data.services;
@@ -138,10 +158,13 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać usług' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     async addService(formData) {
+      this.isLoading = true;
       try {
         if (!formData.name || !formData.price || !formData.description || !formData.duration) {
           showAlert({ icon: 'warning', title: 'Wszystkie pola są wymagane!' });
@@ -155,6 +178,8 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się dodać usługi' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -174,6 +199,7 @@ export const useBusinessStore = defineStore('business', {
       });
 
       if (confirmation.isConfirmed) {
+        this.isLoading = true;
         try {
           const res = await axiosPreset.delete(`/service-item-delete/${id}`);
           await this.fetchServices();
@@ -182,6 +208,8 @@ export const useBusinessStore = defineStore('business', {
         } catch (err) {
           showAlert({ icon: 'error', title: 'Nie udało się usunąć usługi' });
           throw err.response?.data;
+        } finally {
+          this.isLoading = false;
         }
       } else {
         showAlert({ icon: 'info', title: 'Usunięcie anulowane' });
@@ -192,6 +220,7 @@ export const useBusinessStore = defineStore('business', {
     // REVIEWS -------------------------
 
     async fetchReviews(page = 1, rating) {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.get(`/service-reviews/${this.selectedBusiness.id}?page=${page}&rating=${rating}`);
         this.serviceReviews = res.data;
@@ -199,10 +228,13 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać opinii' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     async addReview(formDataRef) {
+      this.isLoading = true;
       try {
         const formData = { ...formDataRef.value };
         formData.service_id = this.selectedBusiness.id;
@@ -218,10 +250,13 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się dodać opinii' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     async editReview(formDataRef) {
+      this.isLoading = true;
       try {
         const formData = { ...formDataRef.value };
         if (!formData.rating || !formData.content) {
@@ -236,12 +271,15 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się zaaktualizować opinii' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
 
     // FAVORITES -------------------------
 
     async fetchFavorites() {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.get('/favorites');
         this.favorites = res.data;
@@ -250,6 +288,8 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać ulubionych usług' })
         throw err.response?.data
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -281,6 +321,7 @@ export const useBusinessStore = defineStore('business', {
     // Categories -------------------------
 
     async fetchCategories() {
+      this.isLoading = true;
       try {
         const res = await axiosPreset.get('/categories');
         this.categories = res.data.categories;
@@ -289,6 +330,8 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Nie udało się pobrać kategorii' });
         throw err.response?.data;
+      } finally {
+        this.isLoading = false;
       }
     },
   },

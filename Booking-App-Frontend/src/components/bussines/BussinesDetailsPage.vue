@@ -1,6 +1,9 @@
 <template>
   <div class="main" v-if="business">
-    <section class="first-column">
+    <div v-if="businessStore.isLoading" class="loading-state">
+      <Loader />
+    </div>
+    <section v-else class="first-column">
       <div class="photo-container" v-if="parsedImages.length">
         <button class="photo-nav-btn left" @click="prevImage" :disabled="currentImageIndex === 0">
           &#10094;
@@ -203,10 +206,6 @@
       </section>
     </section>
   </div>
-
-  <div v-else>
-    <AppLogo class="app-logo" />
-  </div>
 </template>
 
 
@@ -219,6 +218,7 @@ import router from '../../router';
 import AddServiceFormModal from '@/components/forms/AddServiceFormModal.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import Loader from '../common/Loader.vue';
 
 const businessStore = useBusinessStore();
 const authStore = useAuthStore();
