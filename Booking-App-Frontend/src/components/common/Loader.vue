@@ -33,6 +33,7 @@ const businessStore = useBusinessStore();
 
     .line-scale {
         display: flex;
+        padding-bottom: 500px;
         gap: 4px;
     }
 

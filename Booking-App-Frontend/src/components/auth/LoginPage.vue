@@ -1,12 +1,12 @@
 <template>
-    <div>
+    <div style="margin-top: 150px;">
         <div class="container" v-if="!authStore.isLoggedIn">
             <AppLogo class="app-logo" />
             <h2 class="title">Zaloguj się</h2>
             <form @submit.prevent="handleLogin" class="custom-form">
                 <input class="input-field" v-model="email" type="email" placeholder="Email" />
                 <input class="input-field" v-model="password" type="password" placeholder="Hasło" />
-                <button class="custom-button" type="submit">Zaloguj</button>
+                <button class="custom-button" type="submit" style="margin-top: 15px;">Zaloguj</button>
             </form>
             <router-link to="/register">Nie masz konta? Zarejestruj się</router-link>
             <router-link to="/reset-password">Nie pamiętam hasła</router-link>

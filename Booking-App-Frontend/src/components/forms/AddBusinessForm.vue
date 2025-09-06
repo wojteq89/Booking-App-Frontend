@@ -30,7 +30,18 @@
           </div>
         </div>
 
-        <input type="file" multiple @change="handleNewImages" />
+        <div class="social-links-container">
+          <h3>Linki do mediów społecznościowych</h3>
+          <input class="input-field" v-model="form.facebook_url" placeholder="Link do Facebooka" />
+          <input class="input-field" v-model="form.instagram_url" placeholder="Link do Instagrama" />
+          <input class="input-field" v-model="form.youtube_url" placeholder="Link do YouTube" />
+          <input class="input-field" v-model="form.website_url" placeholder="Link do strony internetowej" />
+        </div>
+
+        <div class="add-images-container">
+          <h3>Zdjęcia</h3>
+          <input type="file" multiple @change="handleNewImages" />
+        </div>
         <button class="custom-button" type="submit">Dodaj biznes</button>
       </form>
     </div>
@@ -71,6 +82,18 @@
           </div>
         </div>
 
+        <div class="social-links-container">
+          <h3>Linki do mediów społecznościowych</h3>
+          <input class="input-field" v-model="form.facebook_url"
+            :placeholder="business.myBusiness.facebook_url || 'Link do Facebooka'" />
+          <input class="input-field" v-model="form.instagram_url"
+            :placeholder="business.myBusiness.instagram_url || 'Link do Instagrama'" />
+          <input class="input-field" v-model="form.youtube_url"
+            :placeholder="business.myBusiness.youtube_url || 'Link do YouTube'" />
+          <input class="input-field" v-model="form.website_url"
+            :placeholder="business.myBusiness.website_url || 'Link do strony internetowej'" />
+        </div>
+
         <div class="image-container">
           <h3>Zdjęcia</h3>
 
@@ -84,12 +107,14 @@
           </div>
 
           <!-- Dodawanie nowych zdjęć -->
-          <input type="file" multiple @change="handleNewImages" />
-          <div v-if="form.newImages.length">
-            <h4>Nowe zdjęcia do dodania:</h4>
-            <ul>
-              <li v-for="(file, i) in form.newImages" :key="i">{{ file.name }}</li>
-            </ul>
+          <div class="add-images-container">
+            <h3>Nowe zdjęcia do dodania:</h3>
+            <input type="file" multiple @change="handleNewImages" />
+            <div v-if="form.newImages.length">
+              <ul>
+                <li v-for="(file, i) in form.newImages" :key="i">{{ file.name }}</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -115,7 +140,11 @@ const form = reactive({
   location: '',
   description: '',
   newImages: [],
-  existingImages: []
+  existingImages: [],
+  facebook_url: '',
+  instagram_url: '',
+  youtube_url: '',
+  website_url: ''
 })
 
 onMounted(() => {
@@ -143,6 +172,10 @@ watchEffect(() => {
     form.location = business.myBusiness.location || ''
     form.description = business.myBusiness.description || ''
     form.existingImages = parsedImages.value
+    form.facebook_url = business.myBusiness.facebook_url || ''
+    form.instagram_url = business.myBusiness.instagram_url || ''
+    form.youtube_url = business.myBusiness.youtube_url || ''
+    form.website_url = business.myBusiness.website_url || ''
 
     if (business.myBusiness.opening_hours) {
       const hoursArray = business.myBusiness.opening_hours.split(/\r?\n/)
@@ -185,6 +218,10 @@ const registerBusiness = async () => {
   data.append('location', form.location);
   data.append('description', form.description);
   data.append('opening_hours', generateOpeningHoursString());
+  data.append('facebook_url', form.facebook_url);
+  data.append('instagram_url', form.instagram_url);
+  data.append('youtube_url', form.youtube_url);
+  data.append('website_url', form.website_url);
 
   form.newImages.forEach(file => {
     data.append(`images[]`, file);
@@ -200,6 +237,10 @@ const updateBusiness = async () => {
   data.append('location', form.location)
   data.append('description', form.description)
   data.append('opening_hours', generateOpeningHoursString())
+  data.append('facebook_url', form.facebook_url);
+  data.append('instagram_url', form.instagram_url);
+  data.append('youtube_url', form.youtube_url);
+  data.append('website_url', form.website_url);
 
   form.newImages.forEach(file => data.append('images[]', file))
 
@@ -285,6 +326,12 @@ input[type="time"] {
   }
 }
 
+.social-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .closed-text {
   font-style: italic;
   color: $hint;
@@ -295,6 +342,14 @@ input[type="time"] {
     color: $primary;
     font-size: 20px;
   }
+}
+
+.add-images-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 50px;
 }
 
 .image-container {

@@ -8,10 +8,10 @@
         <input class="input-field" v-model="form.second_name" placeholder="Nazwisko" />
         <input class="input-field" v-model="form.email" placeholder="Email" />
         <input class="input-field" v-model="form.password" type="password" placeholder="Hasło" />
-        <p>Hasło musi mieć conajmniej 6 znaków</p>
+        <p>Wymagania hasła: duży znak, symbol oraz 8 znaków</p>
         <input class="input-field" v-model="form.city" placeholder="Miasto" />
         <input class="input-field" v-model="form.phone_number" placeholder="Numer telefonu" />
-        <button type="submit" class="custom-button">Zarejestruj się</button>
+        <button type="submit" class="custom-button" style="margin-top: 15px;">Zarejestruj się</button>
       </form>
       <router-link to="/login">Masz już konto? Zaloguj się</router-link>
       <router-link to="/reset-password">Nie pamiętam hasła</router-link>

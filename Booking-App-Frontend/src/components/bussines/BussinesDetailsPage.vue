@@ -36,7 +36,8 @@
             <h3 class="service-time">{{ service.duration }}min</h3>
           </div>
           <div class="service-button-row">
-            <button class="service-buy-button custom-button" @click="makeAnAppointment(service)">Umów</button>
+            <button v-if="!isMyBusinessRoute" class="service-buy-button custom-button"
+              @click="makeAnAppointment(service)">Umów</button>
             <button v-if="isOwner && isMyBusinessRoute" class="service-delete-button custom-button"
               @click="deleteService(service.id)">Usuń</button>
           </div>
@@ -193,6 +194,36 @@
       <div class="description">
         <strong>Opis:</strong>
         <p>{{ business.description || 'Brak opisu' }}</p>
+      </div>
+
+      <div class="social-medias">
+        <strong>Media społecznościowe:</strong>
+        <div class="icons">
+          <div v-if="business.facebook_url">
+            <a :href="business.facebook_url" target="_blank">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <p>Facebook</p>
+          </div>
+          <div v-if="business.instagram_url">
+            <a :href="business.instagram_url" target="_blank">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+            <p>Instagram</p>
+          </div>
+          <div v-if="business.youtube_url">
+            <a :href="business.youtube_url" target="_blank">
+              <i class="fa-brands fa-youtube"></i>
+            </a>
+            <p>YouTube</p>
+          </div>
+          <div v-if="business.website_url">
+            <a :href="business.website_url" target="_blank">
+              <i class="fa-solid fa-globe"></i>
+            </a>
+            <p>Strona</p>
+          </div>
+        </div>
       </div>
 
       <div class="category">
@@ -910,6 +941,52 @@ const categoryName = computed(() => {
   border-bottom: 1px solid $primary;
 }
 
+.social-medias {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $primary;
+
+  .icons {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 15px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .icons>div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    color: $white;
+    background-color: $primary;
+    border-radius: 15px;
+    transition: all 0.5s ease;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  p {
+    margin-top: 5px; // Dodaje odstęp między ikoną a tekstem
+    font-size: 14px;
+    color: $primary;
+    text-align: center;
+  }
+}
 
 .category {}
 
