@@ -13,6 +13,7 @@ export const useBusinessStore = defineStore('business', {
     serviceItems: [],
     categories: [],
     isLoading: false,
+    message: null,
     selectedServiceItem: null,
     availableSlots: [],
     serviceReviews: {
@@ -348,19 +349,44 @@ export const useBusinessStore = defineStore('business', {
       try {
         const res = await axiosPreset.get(`/appointments/slots/${serviceId}`, {
           params: {
-            date: date,
+            date,
             service_item_id: serviceId,
           }
         });
-        this.availableSlots = res.data.available_slots;
+
+        if (Array.isArray(res.data.available_slots)) {
+          this.availableSlots = res.data.available_slots;
+          this.message = null;
+        } else {
+          this.availableSlots = [];
+          this.message = res.data.message || 'Brak dostępnych terminów';
+        }
+
         console.log('Dostępne terminy', this.availableSlots);
         return res.data;
       } catch (err) {
-        showAlert({ icon: 'error', title: 'Nie udało się pobrać dostępnych terminów' });
+        showAlert({
+          icon: 'error',
+          title: 'Nie udało się pobrać dostępnych terminów'
+        });
       } finally {
         this.isLoading = false;
       }
     },
+
+    async storeAppointment(serviceItemId, startDateTime) {
+      try {
+        const response = await axiosPreset.post('/appointments', {
+          service_item_id: serviceItemId,
+          start: startDateTime
+        })
+        showAlert({ icon: 'success', title: 'Potwierdzono wizytę!' });
+        router.push(`/business/${this.selectedBusiness.id}`);
+        return response.data
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Coś poszło nie tak podczas umawiania wizyty' });
+      }
+    }
   },
 });
 

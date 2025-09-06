@@ -4,36 +4,43 @@
             <FullCalendar :options="calendarOptions" />
         </div>
 
-        <div v-if="serviceItem" class="service-info-card" :style="{ borderColor: serviceItem.color }">
-            <div class="service-info-header">
-                <h2 class="service-name" :style="{ color: serviceItem.color }">
-                    {{ serviceItem.name }}
-                </h2>
-                <div class="service-meta">
-                    <span class="service-price">{{ serviceItem.price }} zł</span>
-                    <span class="duration">⏱ {{ serviceItem.duration }} min</span>
-                    <span class="color-dot" :style="{ backgroundColor: serviceItem.color }"></span>
+        <div style="padding: 0px 20px;">
+            <div v-if="serviceItem" class="service-info-card" id="select-date"
+                :style="{ borderColor: serviceItem.color }">
+                <div class="service-info-header">
+                    <h2 class="service-name" :style="{ color: serviceItem.color }">
+                        {{ serviceItem.name }}
+                    </h2>
+                    <div class="service-meta">
+                        <span class="service-price">{{ serviceItem.price }} zł</span>
+                        <span class="duration">⏱ {{ serviceItem.duration }} min</span>
+                        <span class="color-dot" :style="{ backgroundColor: serviceItem.color }"></span>
+                    </div>
+                </div>
+                <p class="service-description">{{ serviceItem.description || 'Brak opisu' }}</p>
+            </div>
+
+            <div>
+                <h3 v-if="businessStore.availableSlots.length">Dostępne terminy <br> {{ formattedSelectedDay }}</h3>
+                <h3 v-else>Brak dostępnych terminów na dzisiejszy dzień</h3>
+                <div class="available-slots" v-if="businessStore.availableSlots.length">
+                    <button class="custom-button" v-for="(slot, index) in businessStore.availableSlots" :key="index"
+                        @click="selectedHour = slot" :class="{ 'active-hour': selectedHour === slot }">
+                        {{ slot }}
+                    </button>
+                </div>
+                <button v-if="businessStore.availableSlots.length" @click="bookAppointment"
+                    class="custom-button submit-button">Umów</button>
+                <div class="available-slots" style="margin-bottom: 100px;" v-else>
+                    {{ businessStore.message }}
                 </div>
             </div>
-            <p class="service-description">{{ serviceItem.description || 'Brak opisu' }}</p>
-        </div>
-
-        <div class="available-slots" v-if="businessStore.availableSlots.length">
-            <h3>Dostępne godziny:</h3>
-            <ul>
-                <li v-for="(slot, index) in businessStore.availableSlots" :key="index">
-                    {{ slot }}
-                </li>
-            </ul>
-        </div>
-        <div v-else>
-            Brak dostępnych godzin
         </div>
     </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useBusinessStore } from '@/stores/business'
 
@@ -43,8 +50,9 @@ import interactionPlugin from '@fullcalendar/interaction'
 
 const businessStore = useBusinessStore()
 const { selectedServiceItem: serviceItem, selectedBusiness } = storeToRefs(businessStore)
+const selectedDay = ref(null)
+const selectedHour = ref(null)
 
-// parsedOpeningHours pobiera teraz dynamicznie z store
 const parsedOpeningHours = computed(() => {
     if (!selectedBusiness.value?.opening_hours) return {}
 
@@ -62,13 +70,40 @@ const parsedOpeningHours = computed(() => {
 });
 
 const handleDateClick = (info) => {
-    const clickedDayOfWeek = info.date.getDay();
+    const clickedDayOfWeek = info.date.getDay()
+    selectedDay.value = info.dateStr
+
+    businessStore.fetchAppointmentsSlots(
+        serviceItem.value?.id,
+        info.dateStr
+    )
+
     if (parsedOpeningHours.value[clickedDayOfWeek]) {
-        console.log('Kliknięto w dzień zamknięty. Akcja niedozwolona.');
+        console.log('Kliknięto w dzień zamknięty. Akcja niedozwolona.')
     } else {
-        console.log('Kliknięty dzień:', info.dateStr);
+        console.log('Kliknięty dzień:', info.dateStr)
+
+        const el = document.getElementById('select-date')
+        if (el) {
+            setTimeout(() => {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }, 500)
+        }
+
     }
-};
+}
+
+const formattedSelectedDay = computed(() => {
+    if (!selectedDay.value) return ''
+
+    const date = new Date(selectedDay.value)
+
+    return new Intl.DateTimeFormat('pl-PL', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+    }).format(date)
+})
 
 const handleEventClick = (info) => {
     info.jsEvent.preventDefault();
@@ -92,8 +127,9 @@ const calendarOptions = computed(() => ({
         week: 'Tydzień',
         day: 'Dzień'
     },
-    events: selectedBusiness.value?.appointments || [], // dynamiczne eventy
-    height: 700,
+    events: selectedBusiness.value?.appointments || [],
+    height: 'auto',
+    aspectRatio: 1.2,
     dateClick: handleDateClick,
     eventClick: handleEventClick,
     dayCellClassNames: (info) => {
@@ -104,11 +140,33 @@ const calendarOptions = computed(() => ({
         return [];
     }
 }));
+
+watch(() => businessStore.availableSlots, (slots) => {
+    if (slots.length) {
+        selectedHour.value = slots[0]
+    } else {
+        selectedHour.value = null
+    }
+}, { immediate: true })
+
+const bookAppointment = async () => {
+    if (!selectedHour.value || !selectedDay.value || !serviceItem.value) return;
+
+    const startDateTime = `${selectedDay.value} ${selectedHour.value}:00`;
+
+    try {
+        const appointment = await businessStore.storeAppointment(serviceItem.value.id, startDateTime)
+        console.log('Wizyta umówiona:', appointment)
+    } catch (err) {
+        alert(err.message)
+    }
+}
 </script>
 
 
 <style lang="scss" scoped>
 @use "sass:color";
+@use "@/styles/commonStyles.scss" as *;
 
 .calendar-page {
     display: flex;
@@ -170,6 +228,25 @@ const calendarOptions = computed(() => ({
     margin-top: 20px;
 }
 
+.available-slots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.submit-button {
+    width: 30%;
+    margin-top: 20px;
+    margin-bottom: 100px;
+}
+
+.active-hour {
+    background-color: $primary;
+    color: $white;
+}
+
 :deep(.fc-button-primary) {
     background-color: $primary;
     border-color: $primary;
@@ -211,13 +288,50 @@ const calendarOptions = computed(() => ({
 
 :deep(.fc-day-today .fc-daygrid-day-number) {
     font-weight: bold;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    padding-top: 7px;
+    border: 1px solid $primary;
+    border-radius: 999px;
 }
 
-/* Dni zamknięte */
 :deep(.fc-day-closed) {
     background-color: $primary-light !important;
     opacity: 0.5;
     cursor: not-allowed !important;
     pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .calendar-container {
+        margin-top: 10px;
+    }
+
+    :deep(.fc-header-toolbar) {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    :deep(.fc-daygrid-day-number) {
+        width: 28px;
+        height: 28px;
+        font-size: 0.9rem;
+        padding-top: 5px;
+    }
+
+    :deep(.fc-daygrid-event) {
+        font-size: 0.75rem;
+        padding: 1px 2px;
+    }
+
+    .available-slots {
+        flex-direction: row;
+    }
+
+    .service-info-header {
+        flex-direction: column;
+    }
 }
 </style>
