@@ -1,6 +1,10 @@
 <template>
     <div :class="['navbar', { 'scrolled': isScrolled }]">
         <AppLogo v-if="!isMobile" class="app-logo" @click="goToHome()" />
+        <img @click="goToHome()" class="mobile-logo-callendar" v-if="isMobile"
+            src="/src/assets/Graphics/logo_callendar_TermiNow.svg" alt="terminow_logo">
+        <img @click="goToHome()" class="mobile-logo-inscryption" v-if="isMobile"
+            src="/src/assets/Graphics/logo_inscription_TermiNow.svg" alt="terminow_logo">
 
         <button class="hamburger-menu" @click="toggleMenu">
             <i v-if="!isMenuOpen" class="fas fa-bars"></i>
@@ -8,16 +12,20 @@
         </button>
 
         <div v-if="!isMobile" class="navbar-links">
-            <button class="navbar-button" @click="goToHome()">Home</button>
-            <button class="navbar-button" @click="goToOffers()">Oferty</button>
+            <button class="navbar-button" @click="goToHome()"
+                :class="{ 'active-link': route.path === '/' }">Home</button>
+            <button class="navbar-button" @click="goToOffers()"
+                :class="{ 'active-link': route.path === '/browse-page' }">Oferty</button>
             <button v-if="!isLoggedIn" class="profile-button" @click="goToLogin()">Zaloguj się</button>
             <button v-if="isLoggedIn" class="profile-button" @click="goToSettingsPage()">{{ user.first_name }}</button>
         </div>
 
         <div v-if="isMobile" :class="['mobile-menu', { 'open': isMenuOpen }]">
             <AppLogo class="app-logo" @click="goToHome()" />
-            <button class="navbar-button" @click="goToHome()">Home</button>
-            <button class="navbar-button" @click="goToOffers()">Oferty</button>
+            <button class="navbar-button" @click="goToHome()"
+                :class="{ 'active-mobile-link': route.path === '/' }">Home</button>
+            <button class="navbar-button" @click="goToOffers()"
+                :class="{ 'active-mobile-link': route.path === '/browse-page' }">Oferty</button>
             <button v-if="!isLoggedIn" class="profile-button" @click="goToLogin()">Zaloguj się</button>
             <button v-if="isLoggedIn" class="profile-button" @click="goToSettingsPage()">{{ user.first_name }}</button>
         </div>
@@ -82,6 +90,7 @@ export default defineComponent({
         onBeforeUnmount(() => {
             window.removeEventListener('scroll', handleScroll)
             window.removeEventListener('resize', checkScreenSize)
+            checkScreenSize()
         })
 
         return {
@@ -95,6 +104,7 @@ export default defineComponent({
             isMenuOpen,
             toggleMenu,
             isMobile,
+            route
         }
     },
 })
@@ -111,7 +121,7 @@ export default defineComponent({
     width: 100%;
     height: 70px;
     padding: 0 20px;
-    background-color: $white;
+    background-color: transparent;
     z-index: 50;
     transition: all 0.5s ease-in-out;
     box-sizing: border-box;
@@ -124,6 +134,8 @@ export default defineComponent({
     transform: translateX(-50%);
     box-shadow: 0px 5px 10px 1px $shadow;
     border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
 }
 
 .app-logo {
@@ -136,6 +148,17 @@ export default defineComponent({
         transform: scale(1);
         margin-left: 0;
     }
+}
+
+.mobile-logo-callendar {
+    width: 50px;
+    cursor: pointer;
+}
+
+.mobile-logo-inscryption {
+    margin-right: auto;
+    width: 120px;
+    cursor: pointer;
 }
 
 .navbar-links {
@@ -169,6 +192,7 @@ export default defineComponent({
     cursor: pointer;
     transition: all 0.3s ease-in-out;
     padding: 5px;
+    font-weight: 300;
 
     &::after {
         content: "";
@@ -191,13 +215,20 @@ export default defineComponent({
     }
 }
 
+.active-link {
+    font-weight: bold;
+    &::after {
+        width: 100%;
+    }
+}
+
 .hamburger-menu {
     display: none;
     outline: none;
     background: transparent;
     border: none;
     cursor: pointer;
-    z-index: 60;
+    z-index: 65;
 
     i {
         font-size: 24px;
@@ -218,8 +249,10 @@ export default defineComponent({
     align-items: center;
     gap: 30px;
     transform: translateX(100%);
+    box-shadow: 0px 0px 15px $shadow;
     visibility: hidden;
     transition: transform 0.4s ease-in-out, visibility 0.4s ease-in-out;
+    z-index: 60;
 
     &.open {
         transform: translateX(0);
@@ -232,6 +265,13 @@ export default defineComponent({
     }
 }
 
+.active-mobile-link {
+    font-weight: bold;
+
+    &::after {
+        width: 100%;
+    }
+}
 
 @media screen and (max-width: 768px) {
     .navbar {
