@@ -9,6 +9,7 @@ import ResetPasswordPage from '../components/auth/ResetPasswordPage.vue'
 import FavoritesListPage from '../components/favorites/FavoritesListPage.vue'
 import BrowsePage from '@/components/browsingPage/browsePage.vue'
 import TestPage from '@/components/testPages/testPage.vue'
+import VerifyEmailPage from '../components/auth/VerifyEmailPage.vue'
 
 const routes = [
   { path: '/', component: HomePage },
@@ -25,7 +26,8 @@ const routes = [
   },
   { path: '/reset-password', component: ResetPasswordPage },
   { path: '/favorites', component: FavoritesListPage },
-  {path: '/test-page', component: TestPage}
+  { path: '/test-page', component: TestPage },
+  { path: '/verify-email', component: VerifyEmailPage },
 ]
 
 const router = createRouter({

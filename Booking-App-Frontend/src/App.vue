@@ -74,6 +74,23 @@ body {
     justify-content: center;
 }
 
+.my-confirm-button {
+    background-color: transparent !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    border: 1px solid transparent !important;
+    outline: none !important;
+    padding: 8px 20px !important;
+    font-weight: bold !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease;
+}
+
+.my-confirm-button:hover {
+    background-color: #fff !important;
+    color: #414e66 !important;
+}
+
 /* Animations */
 
 @keyframes slideInView {

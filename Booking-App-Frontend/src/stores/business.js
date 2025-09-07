@@ -4,6 +4,7 @@ import router from '../router';
 import Swal from 'sweetalert2';
 import { icon } from 'leaflet';
 import axios from 'axios';
+import { useAuthStore } from './auth';
 
 export const useBusinessStore = defineStore('business', {
   state: () => ({
@@ -376,13 +377,20 @@ export const useBusinessStore = defineStore('business', {
 
     async storeAppointment(serviceItemId, startDateTime) {
       try {
-        const response = await axiosPreset.post('/appointments', {
-          service_item_id: serviceItemId,
-          start: startDateTime
-        })
-        showAlert({ icon: 'success', title: 'Potwierdzono wizytę!' });
-        router.push(`/business/${this.selectedBusiness.id}`);
-        return response.data
+        const authStore = useAuthStore()
+
+        if (!authStore.isLoggedIn) {
+          showAlert({ icon: 'error', title: 'Musisz się wpierw zalogować aby umówić wizytę.' });
+          return
+        } else {
+          const response = await axiosPreset.post('/appointments', {
+            service_item_id: serviceItemId,
+            start: startDateTime
+          })
+          showAlert({ icon: 'success', title: 'Potwierdzono wizytę!' });
+          router.push(`/business/${this.selectedBusiness.id}`);
+          return response.data
+        }
       } catch (err) {
         showAlert({ icon: 'error', title: 'Coś poszło nie tak podczas umawiania wizyty' });
       }
@@ -390,16 +398,21 @@ export const useBusinessStore = defineStore('business', {
   },
 });
 
+
 export const showAlert = ({ icon = 'info', title = '' }) => {
   Swal.fire({
     icon,
     title,
     text: '',
-    timer: 1000,
+    timer: 2000,
     toast: false,
-    showConfirmButton: false,
+    showConfirmButton: true,
+    confirmButtonText: 'OK',
     timerProgressBar: true,
     background: '#414e66',
     color: '#fff',
+    customClass: {
+      confirmButton: 'my-confirm-button'
+    }
   });
 };

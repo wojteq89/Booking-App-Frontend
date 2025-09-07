@@ -19,7 +19,7 @@
       </div>
       <div class="title-container">
         <h1 class="business-name">{{ business.name }}</h1>
-        <div class="business-add">
+        <div v-if="authStore.isLoggedIn" class="business-add">
           <button @click="toggleFavorite()" class="fav-button">
             <span>
               <i :class="isFavorite ? 'fas fa-heart' : 'far fa-heart'"
@@ -83,46 +83,48 @@
           </div>
         </div>
 
-        <div class="add-review" v-if="!reviews.has_user_reviewed">
-          <h2 class="section-name">Dodaj opinie</h2>
-          <div class="review-form">
-            <div class="review-rating">
-              <label for="rating">Ocena:</label>
-              <select id="rating" class="custom-select" v-model.number="addReviewForm.rating">
-                <option value="5">5</option>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
-                <option value="1">1</option>
-              </select>
-              <p v-for="value in addReviewForm.rating" :key="value" class="star">★</p>
+        <div v-if="authStore.isLoggedIn">
+          <div class="add-review" v-if="!reviews.has_user_reviewed">
+            <h2 class="section-name">Dodaj opinie</h2>
+            <div class="review-form">
+              <div class="review-rating">
+                <label for="rating">Ocena:</label>
+                <select id="rating" class="custom-select" v-model.number="addReviewForm.rating">
+                  <option value="5">5</option>
+                  <option value="4">4</option>
+                  <option value="3">3</option>
+                  <option value="2">2</option>
+                  <option value="1">1</option>
+                </select>
+                <p v-for="value in addReviewForm.rating" :key="value" class="star">★</p>
+              </div>
+              <textarea class="review-textarea" placeholder="Napisz swoją opinie..."
+                v-model="addReviewForm.content"></textarea>
+              <button class="custom-button" @click="addReview">Dodaj opinie</button>
             </div>
-            <textarea class="review-textarea" placeholder="Napisz swoją opinie..."
-              v-model="addReviewForm.content"></textarea>
-            <button class="custom-button" @click="addReview">Dodaj opinie</button>
           </div>
-        </div>
 
-        <div v-else>
-          <h2 class="section-name">Dziękujemy za twoją opinie!</h2>
-          <div class="review-form">
-            <div class="review-rating">
-              <label for="rating">Ocena:</label>
-              <select id="rating" class="custom-select" v-model.number="editReviewForm.rating">
-                <option :value="5">5</option>
-                <option :value="4">4</option>
-                <option :value="3">3</option>
-                <option :value="2">2</option>
-                <option :value="1">1</option>
-              </select>
+          <div v-else>
+            <h2 class="section-name">Dziękujemy za twoją opinie!</h2>
+            <div class="review-form">
+              <div class="review-rating">
+                <label for="rating">Ocena:</label>
+                <select id="rating" class="custom-select" v-model.number="editReviewForm.rating">
+                  <option :value="5">5</option>
+                  <option :value="4">4</option>
+                  <option :value="3">3</option>
+                  <option :value="2">2</option>
+                  <option :value="1">1</option>
+                </select>
 
-              <p v-for="value in editReviewForm.rating" :key="value" class="star">★</p>
+                <p v-for="value in editReviewForm.rating" :key="value" class="star">★</p>
+              </div>
+              <textarea class="review-textarea" :placeholder="userReview?.content || 'Napisz swoją opinię...'"
+                v-model="editReviewForm.content">
+              </textarea>
+
+              <button class="custom-button" @click="editReview">Edytuj opinie</button>
             </div>
-            <textarea class="review-textarea" :placeholder="userReview?.content || 'Napisz swoją opinię...'"
-              v-model="editReviewForm.content">
-            </textarea>
-
-            <button class="custom-button" @click="editReview">Edytuj opinie</button>
           </div>
         </div>
 
@@ -268,8 +270,8 @@ const isFavorite = ref(false);
 const isMyBusinessRoute = computed(() => router.currentRoute.value.name === 'my-business');
 
 const addReviewForm = ref({
-  user_id: authStore.user.id,
-  client_name: authStore.user.first_name,
+  user_id: authStore.isLoggedIn ? authStore.user.id : null,
+  client_name: authStore.isLoggedIn ? authStore.user.first_name : '',
   rating: 5,
   content: '',
 });
@@ -315,9 +317,16 @@ onMounted(async () => {
 watch(
   () => business.value?.id,
   async (newId) => {
-    if (newId) {
-      const value = await businessStore.isFavorited(newId);
-      isFavorite.value = value.favorited;
+    if (newId && authStore.isLoggedIn) {
+      try {
+        const value = await businessStore.isFavorited(newId);
+        isFavorite.value = value?.favorited ?? false;
+      } catch (err) {
+        console.error("Błąd sprawdzania ulubionych:", err);
+        isFavorite.value = false;
+      }
+    } else {
+      isFavorite.value = false;
     }
   },
   { immediate: true }
@@ -343,6 +352,10 @@ const deleteBusiness = async () => {
 
 const checkIsOwner = () => {
   try {
+    if (!authStore.isLoggedIn) {
+      isOwner.value = false;
+      return;
+    }
     isOwner.value = authStore.user.id === businessStore.selectedBusiness.user_id;
   } catch (err) {
     isOwner.value = false;
@@ -415,14 +428,16 @@ const editReview = async () => {
 };
 
 const userReview = computed(() => {
-  if (!reviews.value?.reviews) return null;
-  return reviews.value.reviews.find(review => review.user_id === authStore.user.id) || null;
+  if (!reviews.value?.reviews || !authStore.isLoggedIn) return null;
+  return reviews.value.reviews.find(
+    review => review.user_id === authStore.user.id
+  ) || null;
 });
 
 const editReviewForm = ref({
-  user_id: authStore.user.id,
+  user_id: authStore.isLoggedIn ? authStore.user.id : null,
   id: null,
-  client_name: authStore.user.first_name,
+  client_name: authStore.isLoggedIn ? authStore.user.first_name : '',
   rating: null,
   content: '',
 });
