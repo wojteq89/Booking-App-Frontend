@@ -10,6 +10,7 @@ import FavoritesListPage from '../components/favorites/FavoritesListPage.vue'
 import BrowsePage from '@/components/browsingPage/browsePage.vue'
 import TestPage from '@/components/testPages/testPage.vue'
 import VerifyEmailPage from '../components/auth/VerifyEmailPage.vue'
+import HistoryListPage from '../components/history/HistoryListPage.vue'
 
 const routes = [
   { path: '/', component: HomePage },
@@ -28,6 +29,7 @@ const routes = [
   { path: '/favorites', component: FavoritesListPage },
   { path: '/test-page', component: TestPage },
   { path: '/verify-email', component: VerifyEmailPage },
+  { path: '/history', component: HistoryListPage },
 ]
 
 const router = createRouter({

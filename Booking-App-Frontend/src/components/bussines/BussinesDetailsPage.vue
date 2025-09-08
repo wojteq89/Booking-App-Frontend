@@ -899,7 +899,7 @@ const categoryName = computed(() => {
   gap: 20px;
   word-wrap: break-word;
   overflow: hidden;
-  background-color: rgb(245, 245, 245);
+  background: linear-gradient(120deg, #f5f7fa 0%, #c3cfe296 100%);
   border-radius: 20px;
   transition: all 0.3s ease-in-out;
 }
