@@ -1,5 +1,8 @@
 <template>
-  <div class="main-container">
+  <div v-if="businessStore.isLoading" class="loading-state">
+    <Loader />
+  </div>
+  <div v-else class="main-container">
     <section class="search-section">
       <h2>Wyszukaj usługę</h2>
       <p>Przeglądaj dostępne usługi i znajdź to, czego potrzebujesz</p>
@@ -10,11 +13,7 @@
     </section>
 
     <section class="results-section">
-      <div v-if="businessStore.isLoading" class="loading-state">
-        <Loader />
-      </div>
-
-      <div v-else-if="businessStore.businesses.length === 0" class="no-results">
+      <div v-if="businessStore.businesses.length === 0" class="no-results">
         <p>Brak wyników wyszukiwania.</p>
       </div>
 

@@ -14,8 +14,8 @@
             <div class="bookings-section">
                 <div class="section-header">
                     <div class="header-content">
-                        <h2 class="section-title">Nadchodzące wizyty</h2>
                         <span class="badge-count">{{ confirmedAppointments.length }}</span>
+                        <h2 class="section-title">Nadchodzące wizyty</h2>
                     </div>
                     <div class="section-icon">
                         <i class="fas fa-calendar-check"></i>
@@ -71,8 +71,8 @@
             <div class="bookings-section">
                 <div class="section-header">
                     <div class="header-content">
-                        <h2 class="section-title">Historia wizyt</h2>
                         <span class="badge-count">{{ otherAppointments.length }}</span>
+                        <h2 class="section-title">Historia wizyt</h2>
                     </div>
                     <div class="section-icon">
                         <i class="fas fa-history"></i>
@@ -230,7 +230,7 @@ onMounted(async () => {
     max-width: 1000px;
     margin: 0 auto;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 30px;
 }
 
@@ -380,8 +380,8 @@ onMounted(async () => {
 }
 
 .status-badge.zakończona {
-    background: #f4f6f6;
-    color: #7f8c8d;
+    background: #2ecc703a;
+    color: #2ecc71;
 }
 
 .action-button {
@@ -482,10 +482,6 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
-    .bookings-container {
-        flex-direction: column;
-    }
-
     .bookings-page {
         padding: 15px;
     }

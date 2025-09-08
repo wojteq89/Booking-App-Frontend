@@ -25,6 +25,7 @@ export const useBusinessStore = defineStore('business', {
     },
     favorites: [],
     history: [],
+    allBusinessApointments: [],
     pagination: {
       current_page: 1,
       last_page: 1,
@@ -419,6 +420,19 @@ export const useBusinessStore = defineStore('business', {
         return response;
       } catch (err) {
         showAlert({ icon: 'error', title: 'Coś poszło nie tak podczas anulowania rezerwacji' });
+      }
+    },
+    
+    async fetchAppointmentsById(id) {
+      this.isLoading
+      try {
+        const response = await axiosPreset.get(`/appointments/${id}`)
+        this.allBusinessApointments = response.data
+        console.log('Rezerwacje:', this.allBusinessApointments)
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Coś poszło nie tak podczas pobierania rezerwacji' });
+      } finally {
+        this.isLoading = false
       }
     }
 

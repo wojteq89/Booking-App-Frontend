@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useBusinessStore } from '@/stores/business'
 
@@ -49,7 +49,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
 const businessStore = useBusinessStore()
-const { selectedServiceItem: serviceItem, selectedBusiness } = storeToRefs(businessStore)
+const { selectedServiceItem: serviceItem, selectedBusiness, allBusinessApointments } = storeToRefs(businessStore)
 const selectedDay = ref(null)
 const selectedHour = ref(null)
 
@@ -68,6 +68,34 @@ const parsedOpeningHours = computed(() => {
     }
     return schedule;
 });
+
+const mappedEvents = computed(() => {
+    if (!allBusinessApointments.value || !Array.isArray(allBusinessApointments.value)) {
+        return [];
+    }
+    return allBusinessApointments.value
+        .filter(appointment => appointment.status === 'Potwierdzona')
+        .map(appointment => ({
+            id: appointment.id,
+            title: `${appointment.service_item.name}`,
+            start: appointment.start.replace(' ', 'T'),
+            end: appointment.end.replace(' ', 'T'),
+            color: getColorForStatus(appointment.status)
+        }));
+});
+
+const getColorForStatus = (status) => {
+    switch (status) {
+        case 'Potwierdzona':
+            return 'green';
+        case 'Anulowana':
+            return 'red';
+        case 'Zakończona':
+            return 'gray';
+        default:
+            return 'blue';
+    }
+};
 
 const handleDateClick = (info) => {
     const clickedDayOfWeek = info.date.getDay()
@@ -127,7 +155,7 @@ const calendarOptions = computed(() => ({
         week: 'Tydzień',
         day: 'Dzień'
     },
-    events: selectedBusiness.value?.appointments || [],
+    events: mappedEvents.value,
     height: 'auto',
     aspectRatio: 1.2,
     dateClick: handleDateClick,
@@ -162,7 +190,6 @@ const bookAppointment = async () => {
     }
 }
 </script>
-
 
 <style lang="scss" scoped>
 @use "sass:color";
@@ -332,6 +359,10 @@ const bookAppointment = async () => {
 
     .service-info-header {
         flex-direction: column;
+    }
+
+    .service-description {
+        text-align: center;
     }
 }
 </style>

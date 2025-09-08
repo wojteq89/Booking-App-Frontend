@@ -1,9 +1,9 @@
 <template>
-  <div class="main" v-if="business">
-    <div v-if="businessStore.isLoading" class="loading-state">
-      <Loader />
-    </div>
-    <section v-else class="first-column">
+  <div v-if="businessStore.isLoading" class="loading-state">
+    <Loader />
+  </div>
+  <div class="main" v-else>
+    <section class="first-column">
       <div class="photo-container" v-if="parsedImages.length">
         <button class="photo-nav-btn left" @click="prevImage" :disabled="currentImageIndex === 0">
           &#10094;
@@ -286,6 +286,7 @@ onMounted(async () => {
     }
     await businessStore.fetchServices();
     await businessStore.fetchReviews(1);
+    await businessStore.fetchAppointmentsById(router.currentRoute.value.params.id);
     checkIsOwner();
   } catch (err) {
     console.error('Błąd podczas ładowania usługi:', err);
