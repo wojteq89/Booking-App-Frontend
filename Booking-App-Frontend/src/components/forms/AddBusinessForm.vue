@@ -49,7 +49,7 @@
     <!-- Formularz dla właściciela -->
     <div v-if="authStore.user.role == 'owner' && business.myBusiness" class="container">
       <AppLogo class="app-logo" />
-      <h2 class="title">Edytuj swój biznes</h2>
+      <h2 class="title">Zarządzaj swoim biznesem</h2>
       <form @submit.prevent="updateBusiness" class="custom-form" enctype="multipart/form-data">
         <input class="input-field" v-model="form.name"
           :placeholder="business.myBusiness.name || 'Dodaj nazwę biznesu'" />

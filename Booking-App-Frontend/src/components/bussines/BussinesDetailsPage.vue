@@ -234,6 +234,7 @@
       </div>
       <section v-if="isOwner && isMyBusinessRoute" class="owner-panel">
         <strong>Panel właściciela:</strong>
+        <button class="custom-button" @click="editReservations()">Zarządzaj rezerwacjami</button>
         <button class="custom-button" @click="goToBusinessForm()">Edytuj</button>
         <button class="custom-button delete-button" @click="deleteBusiness">Usuń</button>
       </section>
@@ -281,6 +282,13 @@ onMounted(async () => {
     console.log(router.currentRoute.value.name);
     if (isMyBusinessRoute.value) {
       await businessStore.fetchMyBusiness();
+
+      setTimeout(async () => {
+        if (businessStore.selectedBusiness?.id) {
+          await businessStore.fetchBusinessById(businessStore.selectedBusiness.id);
+          await businessStore.fetchAppointmentsById(businessStore.selectedBusiness.id);
+        }
+      }, 1000);
     } else if (router.currentRoute.value.name === 'business-details') {
       await businessStore.fetchBusinessById(router.currentRoute.value.params.id);
     }
@@ -409,6 +417,10 @@ const makeAnAppointment = async (service) => {
   const today = new Date().toISOString().slice(0, 10)
   await businessStore.setSelectedServiceItem(service)
   await businessStore.fetchAppointmentsSlots(service.id, today)
+  router.push('/test-page')
+}
+
+const editReservations = async () => {
   router.push('/test-page')
 }
 
@@ -1053,6 +1065,7 @@ const categoryName = computed(() => {
 
   .service-button-row {
     width: 100%;
+    margin: 0;
   }
 
   .section-name {

@@ -1,7 +1,7 @@
 <template>
     <div class="calendar-page">
         <div class="calendar-container">
-            <FullCalendar :options="calendarOptions" />
+            <FullCalendar ref="calendarRef" :options="calendarOptions" />
         </div>
 
         <div style="padding: 0px 20px;">
@@ -20,7 +20,7 @@
                 <p class="service-description">{{ serviceItem.description || 'Brak opisu' }}</p>
             </div>
 
-            <div>
+            <div v-if="!isOwner">
                 <h3 v-if="businessStore.availableSlots.length">Dostępne terminy <br> {{ formattedSelectedDay }}</h3>
                 <h3 v-else>Brak dostępnych terminów na dzisiejszy dzień</h3>
                 <div class="available-slots" v-if="businessStore.availableSlots.length">
@@ -36,6 +36,23 @@
                 </div>
             </div>
         </div>
+        <teleport to="body">
+            <transition name="fade">
+                <div v-if="showEventModal" class="modal-backdrop" @click.self="closeEventModal">
+                    <div class="modal">
+                        <h2
+                            :style="{ borderBottom: '2px solid ' + selectedEvent.backgroundColor, paddingBottom: '10px'}">
+                            {{ selectedEvent.title }}
+                        </h2>
+                        <p><strong>Początek:</strong> {{ formatDate(selectedEvent?.start) }}</p>
+                        <p><strong>Koniec:</strong> {{ formatDate(selectedEvent?.end) }}</p>
+                        <button class="custom-button" style="margin-right: 20px;"
+                            @click="cancelAppointment(selectedEvent.id)">Odwołaj</button>
+                        <button class="custom-button" @click="closeEventModal">Zamknij</button>
+                    </div>
+                </div>
+            </transition>
+        </teleport>
     </div>
 </template>
 
@@ -43,16 +60,25 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useBusinessStore } from '@/stores/business'
+import { useAuthStore } from '@/stores/auth'
 
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
 const businessStore = useBusinessStore()
-const { selectedServiceItem: serviceItem, selectedBusiness, allBusinessApointments } = storeToRefs(businessStore)
+const authStore = useAuthStore()
+const { selectedServiceItem: serviceItem, selectedBusiness, allBusinessAppointments } = storeToRefs(businessStore)
 const selectedDay = ref(null)
 const selectedHour = ref(null)
+const isOwner = ref(false)
+const showEventModal = ref(false)
+const selectedEvent = ref(null)
+const calendarRef = ref(null)
 
+onMounted(() => {
+    checkIsOwner()
+})
 const parsedOpeningHours = computed(() => {
     if (!selectedBusiness.value?.opening_hours) return {}
 
@@ -70,54 +96,43 @@ const parsedOpeningHours = computed(() => {
 });
 
 const mappedEvents = computed(() => {
-    if (!allBusinessApointments.value || !Array.isArray(allBusinessApointments.value)) {
+    if (!allBusinessAppointments.value || !Array.isArray(allBusinessAppointments.value)) {
         return [];
     }
-    return allBusinessApointments.value
+    return allBusinessAppointments.value
         .filter(appointment => appointment.status === 'Potwierdzona')
         .map(appointment => ({
             id: appointment.id,
             title: `${appointment.service_item.name}`,
             start: appointment.start.replace(' ', 'T'),
             end: appointment.end.replace(' ', 'T'),
-            color: getColorForStatus(appointment.status)
+            color: appointment.service_item.color || 'blue'
         }));
 });
-
-const getColorForStatus = (status) => {
-    switch (status) {
-        case 'Potwierdzona':
-            return 'green';
-        case 'Anulowana':
-            return 'red';
-        case 'Zakończona':
-            return 'gray';
-        default:
-            return 'blue';
-    }
-};
 
 const handleDateClick = (info) => {
     const clickedDayOfWeek = info.date.getDay()
     selectedDay.value = info.dateStr
 
-    businessStore.fetchAppointmentsSlots(
-        serviceItem.value?.id,
-        info.dateStr
-    )
+    if (!isOwner.value) {
+        businessStore.fetchAppointmentsSlots(
+            serviceItem.value?.id,
+            info.dateStr
+        )
+    } else {
+        const calendarApi = calendarRef.value.getApi()
+        calendarApi.changeView('dayGridDay', info.date)
+    }
 
     if (parsedOpeningHours.value[clickedDayOfWeek]) {
         console.log('Kliknięto w dzień zamknięty. Akcja niedozwolona.')
     } else {
-        console.log('Kliknięty dzień:', info.dateStr)
-
         const el = document.getElementById('select-date')
         if (el) {
             setTimeout(() => {
                 el.scrollIntoView({ behavior: 'smooth', block: 'start' })
             }, 500)
         }
-
     }
 }
 
@@ -134,10 +149,10 @@ const formattedSelectedDay = computed(() => {
 })
 
 const handleEventClick = (info) => {
-    info.jsEvent.preventDefault();
-    const event = info.event;
-    console.log('Kliknięto w wydarzenie o tytule:', event.title);
-};
+    info.jsEvent.preventDefault()
+    if (!isOwner.value) return
+    openEventModal(info.event)
+}
 
 const calendarOptions = computed(() => ({
     plugins: [dayGridPlugin, interactionPlugin],
@@ -189,6 +204,62 @@ const bookAppointment = async () => {
         alert(err.message)
     }
 }
+
+const checkIsOwner = () => {
+    try {
+        if (!authStore.isLoggedIn) {
+            isOwner.value = false
+            return
+        }
+        isOwner.value = authStore.user.id === businessStore.selectedBusiness.user_id
+    } catch (err) {
+        isOwner.value = false
+        console.error('Błąd podczas sprawdzania właściciela:', err)
+    }
+}
+
+const openEventModal = (event) => {
+    selectedEvent.value = {
+        ...event.extendedProps,
+        id: event.id,
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        backgroundColor: event.backgroundColor
+    }
+    showEventModal.value = true
+}
+
+const closeEventModal = () => {
+    showEventModal.value = false
+    selectedEvent.value = null
+}
+
+const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return new Intl.DateTimeFormat('pl-PL', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(date)
+}
+
+const cancelAppointment = async (id) => {
+    try {
+        await businessStore.cancelAppointment(id)
+        await businessStore.fetchAppointmentsById(selectedBusiness.value.id)
+        alert('Wizyta została odwołana.')
+        closeEventModal()
+    } catch (err) {
+        console.error('Błąd podczas anulowania wizyty:', err)
+        alert('Nie udało się anulować wizyty.')
+    }
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -272,6 +343,61 @@ const bookAppointment = async () => {
 .active-hour {
     background-color: $primary;
     color: $white;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+}
+
+/* Dodatkowe animacje dla modala */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 300px;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+.fade-enter-from .modal {
+    transform: scale(1.1);
+}
+
+.fade-enter-to .modal {
+    transform: scale(1.2);
+}
+
+.fade-leave-from .modal {
+    transform: scale(1.2);
+}
+
+.fade-leave-to .modal {
+    transform: scale(1.1);
 }
 
 :deep(.fc-button-primary) {

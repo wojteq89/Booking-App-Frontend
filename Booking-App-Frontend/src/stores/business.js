@@ -25,7 +25,7 @@ export const useBusinessStore = defineStore('business', {
     },
     favorites: [],
     history: [],
-    allBusinessApointments: [],
+    allBusinessAppointments: [],
     pagination: {
       current_page: 1,
       last_page: 1,
@@ -427,8 +427,8 @@ export const useBusinessStore = defineStore('business', {
       this.isLoading
       try {
         const response = await axiosPreset.get(`/appointments/${id}`)
-        this.allBusinessApointments = response.data
-        console.log('Rezerwacje:', this.allBusinessApointments)
+        this.allBusinessAppointments = response.data
+        console.log('Rezerwacje:', this.allBusinessAppointments)
       } catch (err) {
         showAlert({ icon: 'error', title: 'Coś poszło nie tak podczas pobierania rezerwacji' });
       } finally {
