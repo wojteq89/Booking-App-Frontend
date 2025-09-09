@@ -3,7 +3,6 @@
         <Loader />
     </div>
     <div v-else class="bookings-page">
-        <!-- Nagłówek -->
         <div class="page-header">
             <h1 class="page-title">Moje Rezerwacje</h1>
             <p class="page-subtitle">Zarządzaj swoimi wizytami i śledź ich status</p>
@@ -37,7 +36,8 @@
                                     </div>
                                     <div class="detail-item">
                                         <i class="fas fa-map-marker-alt"></i>
-                                        <span>{{ businessStore.categories[appointment.service.category_id]?.name || 'Inne'}}</span>
+                                        <span>{{ businessStore.categories[appointment.service.category_id]?.name ||
+                                            'Inne' }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -57,6 +57,13 @@
                             <button class="cancel-button" @click="cancelAppointment(appointment)">
                                 <i class="fas fa-times"></i> Anuluj
                             </button>
+                            <button class="cancel-button" @click="cancelAppointment(appointment)">
+                                <a :href="getGoogleCalendarLink(appointment)" target="_blank"
+                                    class="google-calendar-button">
+                                    <i class="fas fa-calendar-plus"></i> Dodaj do Google Calendar
+                                </a>
+                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -94,7 +101,8 @@
                                     </div>
                                     <div class="detail-item">
                                         <i class="fas fa-map-marker-alt"></i>
-                                        <span>{{ businessStore.categories[appointment.service.category_id]?.name || 'Inne'}}</span>
+                                        <span>{{ businessStore.categories[appointment.service.category_id]?.name ||
+                                            'Inne' }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -198,6 +206,24 @@ const addReview = (appointment) => {
 onMounted(async () => {
     await businessStore.fetchAppointments();
 });
+
+const getGoogleCalendarLink = (appointment) => {
+    if (!appointment.start || !appointment.end) return '#';
+
+    const start = new Date(appointment.start)
+        .toISOString()
+        .replace(/-|:|\.\d+/g, '');
+    const end = new Date(appointment.end)
+        .toISOString()
+        .replace(/-|:|\.\d+/g, '');
+
+    const title = encodeURIComponent(`${appointment.service_item.name} w ${appointment.service.name}`);
+    const details = encodeURIComponent(appointment.service_item.description || '');
+    const location = encodeURIComponent(appointment.service.location || '');
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+};
+
 </script>
 
 <style scoped>
