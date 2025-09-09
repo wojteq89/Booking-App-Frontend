@@ -189,6 +189,26 @@ export const useBusinessStore = defineStore('business', {
       }
     },
 
+    async updateService(id, formData) {
+      this.isLoading = true;
+      try {
+        if (!formData.name || !formData.price || !formData.description || !formData.duration) {
+          showAlert({ icon: 'warning', title: 'Wszystkie pola są wymagane!' });
+          return;
+        }
+
+        const res = await axiosPreset.put(`/service-item-update/${id}`, formData);
+        await this.fetchServices();
+        showAlert({ icon: 'success', title: 'Usługa została pomyślnie edytowana!' });
+        return res.data;
+      } catch (err) {
+        showAlert({ icon: 'error', title: 'Nie udało się edytować usługi' });
+        throw err.response?.data;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
     async deleteService(id) {
       const confirmation = await Swal.fire({
         title: 'Czy na pewno chcesz usunąć usługę?',
@@ -397,9 +417,9 @@ export const useBusinessStore = defineStore('business', {
         showAlert({ icon: 'error', title: 'Coś poszło nie tak podczas umawiania wizyty' });
       }
     },
-    
+
     // History of reservations -------------------------
-    
+
     async fetchAppointments() {
       this.isLoading = true
       try {
@@ -413,7 +433,7 @@ export const useBusinessStore = defineStore('business', {
         this.isLoading = false
       }
     },
-    
+
     async cancelAppointment(id) {
       try {
         const response = await axiosPreset.post(`/appointments/${id}/cancel`)
@@ -422,7 +442,7 @@ export const useBusinessStore = defineStore('business', {
         showAlert({ icon: 'error', title: 'Coś poszło nie tak podczas anulowania rezerwacji' });
       }
     },
-    
+
     async fetchAppointmentsById(id) {
       this.isLoading
       try {

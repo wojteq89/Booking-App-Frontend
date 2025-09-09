@@ -2,7 +2,9 @@
     <div class="modal-overlay" @click.self="$emit('close')">
         <div class="modal-content" v-if="business">
             <AppLogo class="app-logo" v-if="!isMobile" />
-            <h2 class="description">Dodaj nową usługę w</h2>
+            <h2 class="description">
+                {{ props.service ? 'Edytuj usługę w' : 'Dodaj nową usługę w' }}
+            </h2>
             <form @submit.prevent="handleSubmit" class="custom-form">
                 <h2 class="business-name">{{ business.name }}</h2>
                 <input class="input-field" type="text" placeholder="Nazwa usługi" v-model="formData.name" />
@@ -21,7 +23,9 @@
                     </div>
                 </div>
 
-                <button class="custom-button" type="submit">Dodaj usługę</button>
+                <button class="custom-button" type="submit">
+                    {{ props.service ? 'Zapisz zmiany' : 'Dodaj usługę' }}
+                </button>
             </form>
             <button class="custom-button cancel-button" @click="$emit('close')">Anuluj</button>
         </div>
@@ -40,17 +44,21 @@ const businessStore = useBusinessStore();
 const { myBusiness: business } = storeToRefs(businessStore);
 const isMobile = ref(false);
 
+const props = defineProps({
+    service: { type: Object, default: null }
+});
+
 const colorOptions = [
     'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'teal', 'gray', 'black'
 ];
 
 const formData = reactive({
-    service_id: business.value.id,
-    name: '',
-    description: '',
-    duration: '',
-    price: '',
-    color: null,
+    service_id: business.value?.id,
+    name: props.service?.name || '',
+    description: props.service?.description || '',
+    duration: props.service?.duration || '',
+    price: props.service?.price || '',
+    color: props.service?.color || null,
 });
 
 onMounted(async () => {
@@ -68,9 +76,14 @@ onUnmounted(() => {
 
 const handleSubmit = async () => {
     try {
-        await businessStore.addService(formData);
+        if (props.service) {
+            await businessStore.updateService(props.service.id, formData);
+        } else {
+            await businessStore.addService(formData);
+        }
+        $emit('close');
     } catch (error) {
-        console.error('Error adding service:', error);
+        console.error('Błąd zapisu usługi:', error);
     }
 };
 

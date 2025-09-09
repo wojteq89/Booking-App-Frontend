@@ -38,6 +38,8 @@
           <div class="service-button-row">
             <button v-if="!isMyBusinessRoute" class="service-buy-button custom-button"
               @click="makeAnAppointment(service)">Umów</button>
+            <button v-if="isOwner && isMyBusinessRoute" class="custom-button"
+              @click="openEditService(service)">Edytuj</button>
             <button v-if="isOwner && isMyBusinessRoute" class="service-delete-button custom-button"
               @click="deleteService(service.id)">Usuń</button>
           </div>
@@ -50,6 +52,7 @@
         <Transition name="modal-fade">
           <teleport to="body">
             <AddServiceFormModal v-if="isModalOpen" @close="isModalOpen = false" />
+            <AddServiceFormModal v-if="isEditModalOpen" :service="selectedService" @close="isEditModalOpen = false" />
           </teleport>
         </Transition>
       </section>
@@ -269,6 +272,8 @@ const lastPage = ref(null);
 const rating = ref(null);
 const isFavorite = ref(false);
 const isMyBusinessRoute = computed(() => router.currentRoute.value.name === 'my-business');
+const isEditModalOpen = ref(false);
+const selectedService = ref(null);
 
 const addReviewForm = ref({
   user_id: authStore.isLoggedIn ? authStore.user.id : null,
@@ -411,6 +416,11 @@ const deleteService = async (id) => {
   } catch (err) {
     console.error('Błąd podczas usuwania usługi:', err);
   }
+};
+
+const openEditService = (service) => {
+  selectedService.value = service;
+  isEditModalOpen.value = true;
 };
 
 const makeAnAppointment = async (service) => {
@@ -1009,7 +1019,7 @@ const categoryName = computed(() => {
   }
 
   p {
-    margin-top: 5px; // Dodaje odstęp między ikoną a tekstem
+    margin-top: 5px;
     font-size: 14px;
     color: $primary;
     text-align: center;
@@ -1065,7 +1075,8 @@ const categoryName = computed(() => {
 
   .service-button-row {
     width: 100%;
-    margin: 0;
+    gap: 0px;
+    flex-direction: column;
   }
 
   .section-name {

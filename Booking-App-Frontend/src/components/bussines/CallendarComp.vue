@@ -37,11 +37,11 @@
             </div>
         </div>
         <teleport to="body">
-            <transition name="fade">
+            <transition name="modal-fade">
                 <div v-if="showEventModal" class="modal-backdrop" @click.self="closeEventModal">
                     <div class="modal">
                         <h2
-                            :style="{ borderBottom: '2px solid ' + selectedEvent.backgroundColor, paddingBottom: '10px'}">
+                            :style="{ borderBottom: '2px solid ' + selectedEvent.backgroundColor, paddingBottom: '10px' }">
                             {{ selectedEvent.title }}
                         </h2>
                         <p><strong>Początek:</strong> {{ formatDate(selectedEvent?.start) }}</p>
@@ -360,13 +360,13 @@ const cancelAppointment = async (id) => {
     opacity: 1;
 }
 
-/* Dodatkowe animacje dla modala */
 .modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 999;
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
@@ -380,25 +380,32 @@ const cancelAppointment = async (id) => {
     min-width: 300px;
     max-width: 500px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transform: scale(1.1);
-    transition: transform 0.3s ease;
+    opacity: 1;
+    transition: all 0.3s ease;
 }
 
-.fade-enter-from .modal {
-    transform: scale(1.1);
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+    transition: all 0.5s ease;
 }
 
-.fade-enter-to .modal {
-    transform: scale(1.2);
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+    opacity: 0;
+
+    .modal {
+        transform: translateY(50px);
+    }
 }
 
-.fade-leave-from .modal {
-    transform: scale(1.2);
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+    opacity: 1;
+    .modal {
+        transform: translateY(0);
+    }
 }
 
-.fade-leave-to .modal {
-    transform: scale(1.1);
-}
 
 :deep(.fc-button-primary) {
     background-color: $primary;
