@@ -196,10 +196,12 @@ const bookAppointment = async () => {
     if (!selectedHour.value || !selectedDay.value || !serviceItem.value) return;
 
     const startDateTime = `${selectedDay.value} ${selectedHour.value}:00`;
+    businessStore.selectedTime = startDateTime
 
     try {
         const appointment = await businessStore.storeAppointment(serviceItem.value.id, startDateTime)
         console.log('Wizyta umówiona:', appointment)
+        businessStore.confirmedAppointment = appointment
     } catch (err) {
         alert(err.message)
     }

@@ -13,9 +13,9 @@
 
         <div v-if="!isMobile" class="navbar-links">
             <button class="navbar-button" @click="goToHome()"
-                :class="{ 'active-link': route.path === '/' }">Home</button>
+                :class="{ 'active-link': route.path === '/' }">Strona główna</button>
             <button class="navbar-button" @click="goToOffers()"
-                :class="{ 'active-link': route.path === '/browse-page' }">Oferty</button>
+                :class="{ 'active-link': route.path === '/browse-page' }">Przeglądaj</button>
             <button v-if="isLoggedIn" class="navbar-button" @click="goToFavorites()"
                 :class="{ 'active-link': route.path === '/favorites' }">Ulubione</button>
             <button v-if="isLoggedIn" class="navbar-button" @click="goToHistory()"
@@ -29,9 +29,9 @@
         <div v-if="isMobile" :class="['mobile-menu', { 'open': isMenuOpen }]">
             <AppLogo class="app-logo" @click="goToHome()" />
             <button class="navbar-button" @click="goToHome()"
-                :class="{ 'active-mobile-link': route.path === '/' }">Home</button>
+                :class="{ 'active-mobile-link': route.path === '/' }">Strona główna</button>
             <button class="navbar-button" @click="goToOffers()"
-                :class="{ 'active-mobile-link': route.path === '/browse-page' }">Oferty</button>
+                :class="{ 'active-mobile-link': route.path === '/browse-page' }">Przeglądaj</button>
             <button v-if="isLoggedIn" class="navbar-button" @click="goToFavorites()"
                 :class="{ 'active-link': route.path === '/favorites' }">Ulubione</button>
             <button v-if="isLoggedIn" class="navbar-button" @click="goToHistory()"
@@ -62,7 +62,7 @@ export default defineComponent({
         const isMobile = ref(false)
 
         const checkScreenSize = () => {
-            isMobile.value = window.innerWidth < 950
+            isMobile.value = window.innerWidth < 1000
         }
 
         const handleScroll = () => {
@@ -155,7 +155,7 @@ export default defineComponent({
 }
 
 .navbar.scrolled {
-    width: 90%;
+    width: 95%;
     left: 50%;
     top: 20px;
     transform: translateX(-50%);
@@ -171,7 +171,7 @@ export default defineComponent({
     cursor: pointer;
     z-index: 10;
 
-    @media (max-width: 950px) {
+    @media (max-width: 1000px) {
         transform: scale(1);
         margin-left: 0;
     }
@@ -301,7 +301,7 @@ export default defineComponent({
     }
 }
 
-@media screen and (max-width: 950px) {
+@media screen and (max-width: 1000px) {
     .navbar {
         justify-content: flex-end;
     }

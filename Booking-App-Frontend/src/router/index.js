@@ -11,6 +11,7 @@ import BrowsePage from '@/components/browsingPage/browsePage.vue'
 import TestPage from '@/components/testPages/testPage.vue'
 import VerifyEmailPage from '../components/auth/VerifyEmailPage.vue'
 import HistoryListPage from '../components/history/HistoryListPage.vue'
+import ReservationConfirmed from '../components/bussines/ReservationConfirmed.vue'
 
 const routes = [
   { path: '/', component: HomePage },
@@ -30,6 +31,7 @@ const routes = [
   { path: '/test-page', component: TestPage },
   { path: '/verify-email', component: VerifyEmailPage },
   { path: '/history', component: HistoryListPage },
+  { path: '/reservation-confirmed', component: ReservationConfirmed },
 ]
 
 const router = createRouter({

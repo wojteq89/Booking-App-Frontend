@@ -20,16 +20,16 @@
         <BrowseServiceItem v-else v-for="business in businessStore.businesses" :key="business.id"
           :business="business" />
       </section>
-      
+
       <h2 v-if="authStore.isLoggedIn">Twoje wizyty</h2>
       <section v-if="authStore.isLoggedIn" class="results-section">
         <div v-if="confirmedAppointments.length === 0" class="no-results">
           <p>Brak potwierdzonych wizyt.</p>
         </div>
         <ApointmentsItem v-else v-for="appointment in confirmedAppointments" :key="appointment.id"
-        :appointment="appointment" />
+          :appointment="appointment" />
       </section>
-      
+
       <h2 v-if="authStore.isLoggedIn">Twoje ulubione</h2>
       <section v-if="authStore.isLoggedIn" class="results-section">
         <div v-if="businessStore.favorites.length === 0" class="no-results">
@@ -43,8 +43,7 @@
         <div v-if="businessStore.nearby.length === 0" class="no-results">
           <p>Brak wyników wyszukiwania.</p>
         </div>
-        <BrowseServiceItem v-else v-for="business in businessStore.nearby" :key="business.id"
-          :business="business" />
+        <BrowseServiceItem v-else v-for="business in businessStore.nearby" :key="business.id" :business="business" />
       </section>
     </div>
   </div>
@@ -106,6 +105,12 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-bottom: 120px;
+
+  h2 {
+    margin: 0;
+    margin-top: 60px;
+  }
 
   p {
     font-size: 1.2rem;
@@ -155,23 +160,23 @@ onMounted(async () => {
   justify-content: center;
   align-items: center;
   gap: 30px;
-  margin-top: 100px;
 
   flex-wrap: nowrap;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   justify-content: flex-start;
-  padding: 10px;
-  margin-top: 30px;
+  padding: 30px;
+  margin-bottom: 60px;
 
   width: 100%;
-  max-width: 95vw;
+  max-width: 98vw;
   box-sizing: border-box;
 
   >* {
     flex: 0 0 auto;
     min-width: 250px;
   }
+
 }
 
 .results-section::-webkit-scrollbar {

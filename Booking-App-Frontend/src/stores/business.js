@@ -17,6 +17,8 @@ export const useBusinessStore = defineStore('business', {
     isLoading: false,
     message: null,
     selectedServiceItem: null,
+    selectedTime: null,
+    confirmedAppointment: null,
     availableSlots: [],
     serviceReviews: {
       reviews: [],
@@ -429,7 +431,7 @@ export const useBusinessStore = defineStore('business', {
             start: startDateTime
           })
           showAlert({ icon: 'success', title: 'Potwierdzono wizytę!' });
-          router.push(`/business/${this.selectedBusiness.id}`);
+          router.push('/reservation-confirmed');
           return response.data
         }
       } catch (err) {
