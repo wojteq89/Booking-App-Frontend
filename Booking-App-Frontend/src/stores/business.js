@@ -10,6 +10,7 @@ export const useBusinessStore = defineStore('business', {
   state: () => ({
     myBusiness: null,
     selectedBusiness: null,
+    nearby: [],
     businesses: [],
     serviceItems: [],
     categories: [],
@@ -101,6 +102,24 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Wystąpił błąd podczas pobierania usług' });
         throw err;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async fetchNearbyBusinesses(page = 1, category = '', search = '') {
+      this.isLoading = true;
+      try {
+        const params = {
+          page,
+          ...(category && { category }),
+          ...(search && { search }),
+        };
+
+        const res = await axiosPreset.get('/services-nearby', { params });
+        this.nearby = res.data.data;
+      } catch (err) {
+        console.error(err);
       } finally {
         this.isLoading = false;
       }

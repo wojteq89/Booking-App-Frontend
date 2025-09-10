@@ -1,131 +1,134 @@
 <template>
-    <div v-if="businessStore.isLoading" class="loading-state">
-        <Loader />
-    </div>
-    <div v-else class="bookings-page">
-        <div class="page-header">
-            <h1 class="page-title">Moje Rezerwacje</h1>
-            <p class="page-subtitle">Zarządzaj swoimi wizytami i śledź ich status</p>
+    <div>
+
+        <div v-if="businessStore.isLoading" class="loading-state">
+            <Loader />
         </div>
+        <div v-else class="bookings-page">
+            <div class="page-header">
+                <h1 class="page-title">Moje Rezerwacje</h1>
+                <p class="page-subtitle">Zarządzaj swoimi wizytami i śledź ich status</p>
+            </div>
 
-        <div class="bookings-container">
-            <!-- Sekcja Potwierdzone -->
-            <div class="bookings-section">
-                <div class="section-header">
-                    <div class="header-content">
-                        <span class="badge-count">{{ confirmedAppointments.length }}</span>
-                        <h2 class="section-title">Nadchodzące wizyty</h2>
+            <div class="bookings-container">
+                <!-- Sekcja Potwierdzone -->
+                <div class="bookings-section">
+                    <div class="section-header">
+                        <div class="header-content">
+                            <span class="badge-count">{{ confirmedAppointments.length }}</span>
+                            <h2 class="section-title">Nadchodzące wizyty</h2>
+                        </div>
+                        <div class="section-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
                     </div>
-                    <div class="section-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                </div>
 
-                <div v-if="confirmedAppointments.length > 0" class="appointments-list">
-                    <div v-for="appointment in confirmedAppointments" :key="appointment.id"
-                        class="appointment-card confirmed">
-                        <div class="card-content">
-                            <div class="appointment-info">
-                                <h3 class="service-name">{{ appointment.service.name }}</h3>
-                                <p class="service-item">{{ appointment.service_item.name }}</p>
+                    <div v-if="confirmedAppointments.length > 0" class="appointments-list">
+                        <div v-for="appointment in confirmedAppointments" :key="appointment.id"
+                            class="appointment-card confirmed">
+                            <div class="card-content">
+                                <div class="appointment-info">
+                                    <h3 class="service-name">{{ appointment.service.name }}</h3>
+                                    <p class="service-item">{{ appointment.service_item.name }}</p>
 
-                                <div class="appointment-details">
-                                    <div class="detail-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span>{{ formatDateTime(appointment.start) }}</span>
+                                    <div class="appointment-details">
+                                        <div class="detail-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>{{ formatDateTime(appointment.start) }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>{{ businessStore.categories[appointment.service.category_id]?.name ||
+                                                'Inne' }}</span>
+                                        </div>
                                     </div>
-                                    <div class="detail-item">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>{{ businessStore.categories[appointment.service.category_id]?.name ||
-                                            'Inne' }}</span>
-                                    </div>
+                                </div>
+
+                                <div class="appointment-status">
+                                    <span class="status-badge confirmed">
+                                        <i class="fas fa-check-circle"></i>
+                                        {{ appointment.status }}
+                                    </span>
+                                    <button class="action-button" @click="handleAppointmentAction(appointment)">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="appointment-status">
-                                <span class="status-badge confirmed">
-                                    <i class="fas fa-check-circle"></i>
-                                    {{ appointment.status }}
-                                </span>
-                                <button class="action-button" @click="handleAppointmentAction(appointment)">
-                                    <i class="fas fa-ellipsis-v"></i>
+                            <div class="card-actions" v-if="appointment.showActions">
+                                <button class="cancel-button" @click="cancelAppointment(appointment)">
+                                    <i class="fas fa-times"></i> Anuluj
+                                </button>
+                                <button class="cancel-button" @click="cancelAppointment(appointment)">
+                                    <a :href="getGoogleCalendarLink(appointment)" target="_blank"
+                                        class="google-calendar-button">
+                                        <i class="fas fa-calendar-plus"></i> Dodaj do Google Calendar
+                                    </a>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else class="empty-state">
+                        <i class="fas fa-calendar-plus"></i>
+                        <h3>Brak nadchodzących wizyt</h3>
+                        <p>Zaplanuj nową wizytę, aby zobaczyć ją tutaj</p>
+                    </div>
+                </div>
+
+                <!-- Sekcja Historia -->
+                <div class="bookings-section">
+                    <div class="section-header">
+                        <div class="header-content">
+                            <span class="badge-count">{{ otherAppointments.length }}</span>
+                            <h2 class="section-title">Historia wizyt</h2>
+                        </div>
+                        <div class="section-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                    </div>
+
+                    <div v-if="otherAppointments.length > 0" class="appointments-list">
+                        <div v-for="appointment in otherAppointments" :key="appointment.id"
+                            class="appointment-card history" :class="appointment.status.toLowerCase()">
+                            <div class="card-content">
+                                <div class="appointment-info">
+                                    <h3 class="service-name">{{ appointment.service.name }}</h3>
+                                    <p class="service-item">{{ appointment.service_item.name }}</p>
+
+                                    <div class="appointment-details">
+                                        <div class="detail-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>{{ formatDate(appointment.start) }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>{{ businessStore.categories[appointment.service.category_id]?.name ||
+                                                'Inne' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="appointment-status">
+                                    <span class="status-badge" :class="appointment.status.toLowerCase()">
+                                        <i :class="getStatusIcon(appointment.status)"></i>
+                                        {{ appointment.status }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-footer" v-if="appointment.status === 'Zakończona'">
+                                <button class="review-button" @click="addReview(appointment)">
+                                    <i class="fas fa-star"></i> Oceń wizytę
                                 </button>
                             </div>
                         </div>
-
-                        <div class="card-actions" v-if="appointment.showActions">
-                            <button class="cancel-button" @click="cancelAppointment(appointment)">
-                                <i class="fas fa-times"></i> Anuluj
-                            </button>
-                            <button class="cancel-button" @click="cancelAppointment(appointment)">
-                                <a :href="getGoogleCalendarLink(appointment)" target="_blank"
-                                    class="google-calendar-button">
-                                    <i class="fas fa-calendar-plus"></i> Dodaj do Google Calendar
-                                </a>
-                            </button>
-
-                        </div>
                     </div>
-                </div>
-                <div v-else class="empty-state">
-                    <i class="fas fa-calendar-plus"></i>
-                    <h3>Brak nadchodzących wizyt</h3>
-                    <p>Zaplanuj nową wizytę, aby zobaczyć ją tutaj</p>
-                </div>
-            </div>
-
-            <!-- Sekcja Historia -->
-            <div class="bookings-section">
-                <div class="section-header">
-                    <div class="header-content">
-                        <span class="badge-count">{{ otherAppointments.length }}</span>
-                        <h2 class="section-title">Historia wizyt</h2>
+                    <div v-else class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>Brak historii wizyt</h3>
+                        <p>Twoja historia wizyt pojawi się tutaj</p>
                     </div>
-                    <div class="section-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                </div>
-
-                <div v-if="otherAppointments.length > 0" class="appointments-list">
-                    <div v-for="appointment in otherAppointments" :key="appointment.id" class="appointment-card history"
-                        :class="appointment.status.toLowerCase()">
-                        <div class="card-content">
-                            <div class="appointment-info">
-                                <h3 class="service-name">{{ appointment.service.name }}</h3>
-                                <p class="service-item">{{ appointment.service_item.name }}</p>
-
-                                <div class="appointment-details">
-                                    <div class="detail-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span>{{ formatDate(appointment.start) }}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>{{ businessStore.categories[appointment.service.category_id]?.name ||
-                                            'Inne' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="appointment-status">
-                                <span class="status-badge" :class="appointment.status.toLowerCase()">
-                                    <i :class="getStatusIcon(appointment.status)"></i>
-                                    {{ appointment.status }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="card-footer" v-if="appointment.status === 'Zakończona'">
-                            <button class="review-button" @click="addReview(appointment)">
-                                <i class="fas fa-star"></i> Oceń wizytę
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <h3>Brak historii wizyt</h3>
-                    <p>Twoja historia wizyt pojawi się tutaj</p>
                 </div>
             </div>
         </div>
@@ -226,30 +229,12 @@ const getGoogleCalendarLink = (appointment) => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/styles/commonStyles.scss" as *;
+
 .bookings-page {
     min-height: 100vh;
     padding: 20px;
-}
-
-.page-header {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 20px 0;
-}
-
-.page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 10px;
-}
-
-.page-subtitle {
-    font-size: 1.1rem;
-    color: #7f8c8d;
-    max-width: 600px;
-    margin: 0 auto;
 }
 
 .bookings-container {
@@ -510,10 +495,6 @@ const getGoogleCalendarLink = (appointment) => {
 @media (max-width: 768px) {
     .bookings-page {
         padding: 15px;
-    }
-
-    .page-title {
-        font-size: 2rem;
     }
 
     .card-content {

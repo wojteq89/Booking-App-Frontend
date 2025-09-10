@@ -70,7 +70,7 @@
     transition: all 0.5s ease-in-out;
     margin-bottom: 10px;
     outline: none;
-    
+
 }
 
 .custom-button:hover {
@@ -89,6 +89,25 @@
     margin-bottom: -20px;
 }
 
+.page-header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 @media screen and (max-width: 950px) {
     .container {
         width: 90vw;
@@ -99,6 +118,10 @@
         font-size: 24px;
     }
 
+    .page-title {
+        font-size: 2rem;
+    }
+
     .input-field {
         font-size: medium;
     }
@@ -106,5 +129,5 @@
     .custom-button {
         font-size: medium;
     }
-    
+
 }

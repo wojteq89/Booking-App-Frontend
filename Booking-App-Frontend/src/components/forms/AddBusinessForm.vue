@@ -1,215 +1,157 @@
 <template>
-  <div>
-    <div class="container" v-if="authStore.user.role == 'user'">
-      <AppLogo class="app-logo" />
-      <h2 class="title">Dodaj swój biznes</h2>
-      <form @submit.prevent="registerBusiness" class="custom-form" enctype="multipart/form-data">
-        <input class="input-field" v-model="form.name" placeholder="Dodaj nazwę biznesu" />
-        <select v-model="form.category_id" class="input-field">
-          <option value="">Wybierz kategorię</option>
-          <option v-for="category in business.categories" :key="category.id" :value="category.id">
-            {{ category.name }}
-          </option>
-        </select>
-        <input class="input-field" v-model="form.location" placeholder="Dodaj adres" />
-        <input class="input-field" v-model="form.description" placeholder="Dodaj opis" />
+  <div class="container"
+    v-if="authStore.user.role === 'user' || (authStore.user.role === 'owner' && business.myBusiness)">
+    <AppLogo class="app-logo" />
+    <h2 class="title">{{ isEditMode ? 'Zarządzaj swoim biznesem' : 'Dodaj swój biznes' }}</h2>
+    <form @submit.prevent="isEditMode ? updateBusiness() : registerBusiness()" class="custom-form"
+      enctype="multipart/form-data">
+      <input class="input-field" v-model="form.name" placeholder="Dodaj nazwę biznesu" />
+      <select v-model="form.category_id" class="input-field">
+        <option value="">Wybierz kategorię</option>
+        <option v-for="category in business.categories" :key="category.id" :value="category.id">
+          {{ category.name }}
+        </option>
+      </select>
+      <input class="input-field" v-model="form.location" placeholder="Dodaj adres" />
+      <input class="input-field" v-model="form.description" placeholder="Dodaj opis" />
 
-        <div class="open-hours-container">
-          <h3>Godziny otwarcia</h3>
-          <div v-for="(day, index) in daysOfWeek" :key="index" class="day-row">
-            <label>
-              <input type="checkbox" v-model="openingHours[day].open" />
-              {{ day }}
-            </label>
-            <div v-if="openingHours[day].open" class="time-inputs">
-              <input type="time" v-model="openingHours[day].from" />
-              <span>do</span>
-              <input type="time" v-model="openingHours[day].to" />
-            </div>
-            <div v-else class="closed-text">Zamknięte</div>
+      <div class="open-hours-container">
+        <h3>Godziny otwarcia</h3>
+        <div v-for="(day, index) in daysOfWeek" :key="index" class="day-row">
+          <label>
+            <input type="checkbox" v-model="openingHours[day].open" />
+            {{ day }}
+          </label>
+          <div v-if="openingHours[day].open" class="time-inputs">
+            <input type="time" v-model="openingHours[day].from" />
+            <span>do</span>
+            <input type="time" v-model="openingHours[day].to" />
+          </div>
+          <div v-else class="closed-text">Zamknięte</div>
+        </div>
+      </div>
+
+      <div class="social-links-container">
+        <h3>Linki do mediów społecznościowych</h3>
+        <input class="input-field" v-model="form.facebook_url" placeholder="Link do Facebooka" />
+        <input class="input-field" v-model="form.instagram_url" placeholder="Link do Instagrama" />
+        <input class="input-field" v-model="form.youtube_url" placeholder="Link do YouTube" />
+        <input class="input-field" v-model="form.website_url" placeholder="Link do strony internetowej" />
+      </div>
+
+      <div class="image-container">
+        <h3>Zdjęcia</h3>
+        <div v-if="form.existingImages.length" class="existing-images-previews">
+          <div v-for="(img, index) in form.existingImages" :key="index" class="image-preview">
+            <img :src="img" alt="Business Image" class="preview-img" />
+            <button class="service-delete-button custom-button" type="button"
+              @click="removeExistingImage(index)">Usuń</button>
           </div>
         </div>
-
-        <div class="social-links-container">
-          <h3>Linki do mediów społecznościowych</h3>
-          <input class="input-field" v-model="form.facebook_url" placeholder="Link do Facebooka" />
-          <input class="input-field" v-model="form.instagram_url" placeholder="Link do Instagrama" />
-          <input class="input-field" v-model="form.youtube_url" placeholder="Link do YouTube" />
-          <input class="input-field" v-model="form.website_url" placeholder="Link do strony internetowej" />
-        </div>
-
         <div class="add-images-container">
-          <h3>Zdjęcia</h3>
+          <h3>Nowe zdjęcia do dodania:</h3>
           <input type="file" multiple @change="handleNewImages" />
-        </div>
-        <button class="custom-button" type="submit">Dodaj biznes</button>
-      </form>
-    </div>
-
-    <!-- Formularz dla właściciela -->
-    <div v-if="authStore.user.role == 'owner' && business.myBusiness" class="container">
-      <AppLogo class="app-logo" />
-      <h2 class="title">Zarządzaj swoim biznesem</h2>
-      <form @submit.prevent="updateBusiness" class="custom-form" enctype="multipart/form-data">
-        <input class="input-field" v-model="form.name"
-          :placeholder="business.myBusiness.name || 'Dodaj nazwę biznesu'" />
-        <select v-model="form.category_id" class="input-field">
-          <option value="">
-            {{ business.categories[business.myBusiness.category_id ? business.myBusiness.category_id - 1 : 0].name }}
-          </option>
-          <option v-for="category in business.categories" :key="category.id" :value="category.id">
-            {{ category.name }}
-          </option>
-        </select>
-        <input class="input-field" v-model="form.location"
-          :placeholder="business.myBusiness.location || 'Dodaj adres'" />
-        <input class="input-field" v-model="form.description"
-          :placeholder="business.myBusiness.description || 'Dodaj opis'" />
-
-        <div class="open-hours-container">
-          <h3>Godziny otwarcia</h3>
-          <div v-for="(day, index) in daysOfWeek" :key="index" class="day-row">
-            <label>
-              <input type="checkbox" v-model="openingHours[day].open" />
-              {{ day }}
-            </label>
-            <div v-if="openingHours[day].open" class="time-inputs">
-              <input type="time" v-model="openingHours[day].from" />
-              <span>do</span>
-              <input type="time" v-model="openingHours[day].to" />
-            </div>
-            <div v-else class="closed-text">Zamknięte</div>
+          <div v-if="form.newImages.length">
+            <ul>
+              <li v-for="(file, i) in form.newImages" :key="i">{{ file.name }}</li>
+            </ul>
           </div>
         </div>
+      </div>
 
-        <div class="social-links-container">
-          <h3>Linki do mediów społecznościowych</h3>
-          <input class="input-field" v-model="form.facebook_url"
-            :placeholder="business.myBusiness.facebook_url || 'Link do Facebooka'" />
-          <input class="input-field" v-model="form.instagram_url"
-            :placeholder="business.myBusiness.instagram_url || 'Link do Instagrama'" />
-          <input class="input-field" v-model="form.youtube_url"
-            :placeholder="business.myBusiness.youtube_url || 'Link do YouTube'" />
-          <input class="input-field" v-model="form.website_url"
-            :placeholder="business.myBusiness.website_url || 'Link do strony internetowej'" />
-        </div>
-
-        <div class="image-container">
-          <h3>Zdjęcia</h3>
-
-          <!-- Istniejące zdjęcia -->
-          <div v-if="form.existingImages.length">
-            <div v-for="(img, index) in form.existingImages" :key="index" class="image-preview">
-              <img :src="img" alt="Business Image" class="preview-img" />
-              <button class="service-delete-button custom-button" type="button"
-                @click="removeExistingImage(index)">Usuń</button>
-            </div>
-          </div>
-
-          <!-- Dodawanie nowych zdjęć -->
-          <div class="add-images-container">
-            <h3>Nowe zdjęcia do dodania:</h3>
-            <input type="file" multiple @change="handleNewImages" />
-            <div v-if="form.newImages.length">
-              <ul>
-                <li v-for="(file, i) in form.newImages" :key="i">{{ file.name }}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <button class="custom-button" type="submit">Zapisz zmiany</button>
-      </form>
-    </div>
+      <button class="custom-button" type="submit">{{ isEditMode ? 'Zapisz zmiany' : 'Dodaj biznes' }}</button>
+    </form>
+  </div>
+  <div v-else-if="authStore.user.role === 'user'">
+    <p>Aby dodać biznes, wypełnij formularz.</p>
+  </div>
+  <div v-else>
+    <Loader/>
   </div>
 </template>
 
 <script setup>
-import { reactive, computed, watchEffect, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useBusinessStore } from '@/stores/business'
+import { reactive, computed, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useBusinessStore } from '@/stores/business';
+import AppLogo from '@/components/common/AppLogo.vue';
+import Loader from '../common/Loader.vue';
 
-const authStore = useAuthStore()
-const business = useBusinessStore()
+const authStore = useAuthStore();
+const business = useBusinessStore();
+const isEditMode = computed(() => !!business.myBusiness);
 
-const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']
+const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
+
+const parseOpeningHours = (hoursString) => {
+  const hours = {};
+  if (hoursString) {
+    const hoursArray = hoursString.split(/\r?\n/);
+    daysOfWeek.forEach((day, index) => {
+      const value = hoursArray[index] || 'Zamknięte';
+      if (value !== 'Zamknięte') {
+        const [from, to] = value.split('-');
+        hours[day] = { open: true, from, to };
+      } else {
+        hours[day] = { open: false, from: '08:00', to: '16:00' };
+      }
+    });
+  } else {
+    daysOfWeek.forEach(day => {
+      hours[day] = { open: false, from: '08:00', to: '16:00' };
+    });
+  }
+  return hours;
+};
+
+const parseImages = (images) => {
+  try {
+    const imagesArray = images ? JSON.parse(images) : [];
+    return imagesArray.map(image => `http://127.0.0.1:8000${image}`);
+  } catch (e) {
+    console.error("Błąd parsowania zdjęć:", e);
+    return [];
+  }
+};
 
 const form = reactive({
-  name: '',
-  category_id: '',
-  location: '',
-  description: '',
+  name: business.myBusiness?.name || '',
+  category_id: business.myBusiness?.category_id || '',
+  location: business.myBusiness?.location || '',
+  description: business.myBusiness?.description || '',
   newImages: [],
-  existingImages: [],
-  facebook_url: '',
-  instagram_url: '',
-  youtube_url: '',
-  website_url: ''
-})
+  existingImages: parseImages(business.myBusiness?.images),
+  facebook_url: business.myBusiness?.facebook_url || '',
+  instagram_url: business.myBusiness?.instagram_url || '',
+  youtube_url: business.myBusiness?.youtube_url || '',
+  website_url: business.myBusiness?.website_url || ''
+});
+
+const openingHours = reactive(parseOpeningHours(business.myBusiness?.opening_hours));
 
 onMounted(() => {
   business.fetchCategories();
+  if (authStore.user.role === 'owner') {
+    business.fetchMyBusiness();
+  }
 });
 
-const openingHours = reactive(
-  Object.fromEntries(daysOfWeek.map(day => [day, { open: false, from: '08:00', to: '16:00' }]))
-)
-
-const parsedImages = computed(() => {
-  try {
-    const imagesArray = business.myBusiness?.images ? JSON.parse(business.myBusiness.images) : []
-    return imagesArray.map(image => `http://127.0.0.1:8000${image}`)
-  } catch (e) {
-    console.error("Błąd parsowania zdjęć:", e)
-    return []
-  }
-})
-
-watchEffect(() => {
-  if (business.myBusiness) {
-    form.name = business.myBusiness.name || ''
-    form.category_id = business.myBusiness.category?.id || '';
-    form.location = business.myBusiness.location || ''
-    form.description = business.myBusiness.description || ''
-    form.existingImages = parsedImages.value
-    form.facebook_url = business.myBusiness.facebook_url || ''
-    form.instagram_url = business.myBusiness.instagram_url || ''
-    form.youtube_url = business.myBusiness.youtube_url || ''
-    form.website_url = business.myBusiness.website_url || ''
-
-    if (business.myBusiness.opening_hours) {
-      const hoursArray = business.myBusiness.opening_hours.split(/\r?\n/)
-      daysOfWeek.forEach((day, index) => {
-        const value = hoursArray[index] || 'Zamknięte'
-        if (value !== 'Zamknięte') {
-          const [from, to] = value.split('-')
-          openingHours[day].open = true
-          openingHours[day].from = from
-          openingHours[day].to = to
-        } else {
-          openingHours[day].open = false
-        }
-      })
-    }
-  }
-})
-
 const handleNewImages = (e) => {
-  form.newImages = Array.from(e.target.files)
-}
+  form.newImages = Array.from(e.target.files);
+};
 
 const removeExistingImage = (index) => {
-  form.existingImages.splice(index, 1)
-}
+  form.existingImages.splice(index, 1);
+};
 
 const generateOpeningHoursString = () => {
   return daysOfWeek
     .map(day => {
-      const { open, from, to } = openingHours[day]
-      return open ? `${from}-${to}` : 'Zamknięte'
+      const { open, from, to } = openingHours[day];
+      return open ? `${from}-${to}` : 'Zamknięte';
     })
-    .join('\n')
-}
+    .join('\n');
+};
 
 const registerBusiness = async () => {
   const data = new FormData();
@@ -222,34 +164,26 @@ const registerBusiness = async () => {
   data.append('instagram_url', form.instagram_url);
   data.append('youtube_url', form.youtube_url);
   data.append('website_url', form.website_url);
-
-  form.newImages.forEach(file => {
-    data.append(`images[]`, file);
-  });
-
+  form.newImages.forEach(file => data.append(`images[]`, file));
   await business.registerBusiness(data);
 };
 
 const updateBusiness = async () => {
-  const data = new FormData()
-  data.append('name', form.name)
+  const data = new FormData();
+  data.append('name', form.name);
   data.append('category_id', form.category_id);
-  data.append('location', form.location)
-  data.append('description', form.description)
-  data.append('opening_hours', generateOpeningHoursString())
+  data.append('location', form.location);
+  data.append('description', form.description);
+  data.append('opening_hours', generateOpeningHoursString());
   data.append('facebook_url', form.facebook_url);
   data.append('instagram_url', form.instagram_url);
   data.append('youtube_url', form.youtube_url);
   data.append('website_url', form.website_url);
-
-  form.newImages.forEach(file => data.append('images[]', file))
-
-  const existingPaths = form.existingImages.map(url => url.replace('http://127.0.0.1:8000', ''))
-  data.append('existing_images', JSON.stringify(existingPaths))
-
-  const response = await business.updateBusiness(business.myBusiness.id, data)
-  console.log(response)
-}
+  form.newImages.forEach(file => data.append('images[]', file));
+  const existingPaths = form.existingImages.map(url => url.replace('http://127.0.0.1:8000', ''));
+  data.append('existing_images', JSON.stringify(existingPaths));
+  await business.updateBusiness(business.myBusiness.id, data);
+};
 </script>
 
 
@@ -327,9 +261,9 @@ input[type="time"] {
 }
 
 .social-links-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .closed-text {

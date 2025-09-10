@@ -1,247 +1,250 @@
 <template>
-  <div v-if="businessStore.isLoading" class="loading-state">
-    <Loader />
-  </div>
-  <div class="main" v-else>
-    <section class="first-column">
-      <div class="photo-container" v-if="parsedImages.length">
-        <button class="photo-nav-btn left" @click="prevImage" :disabled="currentImageIndex === 0">
-          &#10094;
-        </button>
-        <div class="image-slider" :style="sliderStyle">
-          <img v-for="(image, index) in parsedImages" :key="index" :src="image" class="business-image"
-            alt="Zdjęcie usługi" />
-        </div>
-        <button class="photo-nav-btn right" @click="nextImage"
-          :disabled="currentImageIndex === parsedImages.length - 1">
-          &#10095;
-        </button>
-      </div>
-      <div class="title-container">
-        <h1 class="business-name">{{ business.name }}</h1>
-        <div v-if="authStore.isLoggedIn" class="business-add">
-          <button @click="toggleFavorite()" class="fav-button">
-            <span>
-              <i :class="isFavorite ? 'fas fa-heart' : 'far fa-heart'"
-                :style="{ color: isFavorite ? '#e74c3c' : '' }"></i> </span>
+  <div>
+    <div v-if="businessStore.isLoading" class="loading-state">
+      <Loader />
+    </div>
+    <div class="main" v-else-if="business">
+      <section class="first-column">
+        <div class="photo-container" v-if="parsedImages.length">
+          <button class="photo-nav-btn left" @click="prevImage" :disabled="currentImageIndex === 0">
+            &#10094;
+          </button>
+          <div class="image-slider" :style="sliderStyle">
+            <img v-for="(image, index) in parsedImages" :key="index" :src="image" class="business-image"
+              alt="Zdjęcie usługi" />
+          </div>
+          <button class="photo-nav-btn right" @click="nextImage"
+            :disabled="currentImageIndex === parsedImages.length - 1">
+            &#10095;
           </button>
         </div>
-      </div>
-      <section class="services-section">
-        <h2 class="section-name">Usługi</h2>
-        <div class="service-item" v-for="service in services" :key="service.id">
-          <h3>{{ service.name }}</h3>
-          <div class="service-buy">
-            <h3 class="service-price">{{ service.price }}zł</h3>
-            <h3 class="service-time">{{ service.duration }}min</h3>
-          </div>
-          <div class="service-button-row">
-            <button v-if="!isMyBusinessRoute" class="service-buy-button custom-button"
-              @click="makeAnAppointment(service)">Umów</button>
-            <button v-if="isOwner && isMyBusinessRoute" class="custom-button"
-              @click="openEditService(service)">Edytuj</button>
-            <button v-if="isOwner && isMyBusinessRoute" class="service-delete-button custom-button"
-              @click="deleteService(service.id)">Usuń</button>
+        <div class="title-container">
+          <h1 class="business-name">{{ business.name }}</h1>
+          <div v-if="authStore.isLoggedIn" class="business-add">
+            <button @click="toggleFavorite()" class="fav-button">
+              <span>
+                <i :class="isFavorite ? 'fas fa-heart' : 'far fa-heart'"
+                  :style="{ color: isFavorite ? '#e74c3c' : '' }"></i> </span>
+            </button>
           </div>
         </div>
-        <button v-if="isOwner && isMyBusinessRoute" class="add-service-button" @click="addService">
-          +
-          <span class="add-service-button-text">Dodaj usługę</span>
-        </button>
+        <section class="services-section">
+          <h2 class="section-name">Usługi</h2>
+          <div class="service-item" v-for="service in services" :key="service.id">
+            <h3>{{ service.name }}</h3>
+            <div class="service-buy">
+              <h3 class="service-price">{{ service.price }}zł</h3>
+              <h3 class="service-time">{{ service.duration }}min</h3>
+            </div>
+            <div class="service-button-row">
+              <button v-if="!isMyBusinessRoute" class="service-buy-button custom-button"
+                @click="makeAnAppointment(service)">Umów</button>
+              <button v-if="isOwner && isMyBusinessRoute" class="custom-button"
+                @click="openEditService(service)">Edytuj</button>
+              <button v-if="isOwner && isMyBusinessRoute" class="service-delete-button custom-button"
+                @click="deleteService(service.id)">Usuń</button>
+            </div>
+          </div>
+          <button v-if="isOwner && isMyBusinessRoute" class="add-service-button" @click="addService">
+            +
+            <span class="add-service-button-text">Dodaj usługę</span>
+          </button>
 
-        <Transition name="modal-fade">
-          <teleport to="body">
-            <AddServiceFormModal v-if="isModalOpen" @close="isModalOpen = false" />
-            <AddServiceFormModal v-if="isEditModalOpen" :service="selectedService" @close="isEditModalOpen = false" />
-          </teleport>
-        </Transition>
-      </section>
+          <Transition name="modal-fade">
+            <teleport to="body">
+              <AddServiceFormModal v-if="isModalOpen" @close="isModalOpen = false" />
+              <AddServiceFormModal v-if="isEditModalOpen" :service="selectedService" @close="isEditModalOpen = false" />
+            </teleport>
+          </Transition>
+        </section>
 
-      <section class="reviews-section">
-        <h2 v-if="reviews.reviews.length" class="section-name">Opinie</h2>
-        <div class="reviews-summary">
-          <div>
-            <strong>Średnia ocena: {{ reviews.average_rating }}</strong>
+        <section class="reviews-section">
+          <h2 v-if="reviews.reviews.length" class="section-name">Opinie</h2>
+          <div class="reviews-summary">
             <div>
-              <img v-for="i in starDisplay.full" :key="'full-' + i" class="star"
-                src="../../assets/Graphics/full_star.png" alt="Pełna gwiazdka">
-              <img v-if="starDisplay.half" class="star" src="../../assets/Graphics/half_star.png" alt="Pół gwiazdki">
-              <img v-for="i in starDisplay.empty" :key="'empty-' + i" class="star"
-                src="../../assets/Graphics/empty_star.png" alt="Pusta gwiazdka">
-            </div>
-            <p>Na podstawie {{ reviews.total }} opinii</p>
-          </div>
-          <div class="reviews-count">
-            <div class="reviews-column">
-              <p v-for="i in 5" :key="i" class="reviews-rating">{{ i }}</p>
-            </div>
-            <div class="reviews-column">
-              <img v-for="i in 5" :key="i" class="star" src="../../assets/Graphics/full_star.png" alt="Pełna gwiazdka">
-            </div>
-            <div class="reviews-column">
-              <p v-for="(count, rating) in reviews.ratings_breakdown" :key="rating" class="reviews-rating">
-                {{ count }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="authStore.isLoggedIn">
-          <div class="add-review" v-if="!reviews.has_user_reviewed">
-            <h2 class="section-name">Dodaj opinie</h2>
-            <div class="review-form">
-              <div class="review-rating">
-                <label for="rating">Ocena:</label>
-                <select id="rating" class="custom-select" v-model.number="addReviewForm.rating">
-                  <option value="5">5</option>
-                  <option value="4">4</option>
-                  <option value="3">3</option>
-                  <option value="2">2</option>
-                  <option value="1">1</option>
-                </select>
-                <p v-for="value in addReviewForm.rating" :key="value" class="star">★</p>
+              <strong>Średnia ocena: {{ reviews.average_rating }}</strong>
+              <div>
+                <img v-for="i in starDisplay.full" :key="'full-' + i" class="star"
+                  src="../../assets/Graphics/full_star.png" alt="Pełna gwiazdka">
+                <img v-if="starDisplay.half" class="star" src="../../assets/Graphics/half_star.png" alt="Pół gwiazdki">
+                <img v-for="i in starDisplay.empty" :key="'empty-' + i" class="star"
+                  src="../../assets/Graphics/empty_star.png" alt="Pusta gwiazdka">
               </div>
-              <textarea class="review-textarea" placeholder="Napisz swoją opinie..."
-                v-model="addReviewForm.content"></textarea>
-              <button class="custom-button" @click="addReview">Dodaj opinie</button>
+              <p>Na podstawie {{ reviews.total }} opinii</p>
             </div>
-          </div>
-
-          <div v-else>
-            <h2 class="section-name">Dziękujemy za twoją opinie!</h2>
-            <div class="review-form">
-              <div class="review-rating">
-                <label for="rating">Ocena:</label>
-                <select id="rating" class="custom-select" v-model.number="editReviewForm.rating">
-                  <option :value="5">5</option>
-                  <option :value="4">4</option>
-                  <option :value="3">3</option>
-                  <option :value="2">2</option>
-                  <option :value="1">1</option>
-                </select>
-
-                <p v-for="value in editReviewForm.rating" :key="value" class="star">★</p>
+            <div class="reviews-count">
+              <div class="reviews-column">
+                <p v-for="i in 5" :key="i" class="reviews-rating">{{ i }}</p>
               </div>
-              <textarea class="review-textarea" :placeholder="userReview?.content || 'Napisz swoją opinię...'"
-                v-model="editReviewForm.content">
-              </textarea>
-
-              <button class="custom-button" @click="editReview">Edytuj opinie</button>
-            </div>
-          </div>
-        </div>
-
-        <h2 class="section-name">Opinie wszystkich użytkowników</h2>
-        <div class="reviews-filter">
-          Sortuj według:
-          <select id="rating" class="custom-select" v-model.number="rating" @change="onRatingChange">
-            <option :value="5">5</option>
-            <option :value="4">4</option>
-            <option :value="3">3</option>
-            <option :value="2">2</option>
-            <option :value="1">1</option>
-          </select>
-          <p v-if="rating" v-for="star in rating" :key="star" class="star">★</p>
-          <button class="custom-button" @click="clearFilter">Wyczyść filtr</button>
-        </div>
-        <div v-if="!reviews.reviews.length" class="user-reviews">
-          <h2 class="section-name">Brak opinii</h2>
-        </div>
-        <div class="user-reviews" v-else>
-          <div class="review-item" v-for="review in reviews.reviews" :key="review.id">
-            <div class="review-info">
-              <p class="review-author">{{ review.client_name }}</p>
-              <div class="review-right">
-                <p class="review-rating"><span v-for="i in review.rating">★</span></p>
-                <p class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</p>
+              <div class="reviews-column">
+                <img v-for="i in 5" :key="i" class="star" src="../../assets/Graphics/full_star.png"
+                  alt="Pełna gwiazdka">
+              </div>
+              <div class="reviews-column">
+                <p v-for="(count, rating) in reviews.ratings_breakdown" :key="rating" class="reviews-rating">
+                  {{ count }}
+                </p>
               </div>
             </div>
-            <p class="review-text">{{ review.content }}</p>
           </div>
-          <div class="pagination">
-            <button class="custom-button" @click="loadReviews(currentPage - 1)"
-              :disabled="currentPage === 1">Poprzednia</button>
-            <span>Strona {{ currentPage }} z {{ lastPage }}</span>
-            <button class="custom-button" @click="loadReviews(currentPage + 1)"
-              :disabled="currentPage === lastPage">Następna</button>
+
+          <div v-if="authStore.isLoggedIn">
+            <div class="add-review" v-if="!reviews.has_user_reviewed">
+              <h2 class="section-name">Dodaj opinie</h2>
+              <div class="review-form">
+                <div class="review-rating">
+                  <label for="rating">Ocena:</label>
+                  <select id="rating" class="custom-select" v-model.number="addReviewForm.rating">
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                  </select>
+                  <p v-for="value in addReviewForm.rating" :key="value" class="star">★</p>
+                </div>
+                <textarea class="review-textarea" placeholder="Napisz swoją opinie..."
+                  v-model="addReviewForm.content"></textarea>
+                <button class="custom-button" @click="addReview">Dodaj opinie</button>
+              </div>
+            </div>
+
+            <div v-else>
+              <h2 class="section-name">Dziękujemy za twoją opinie!</h2>
+              <div class="review-form">
+                <div class="review-rating">
+                  <label for="rating">Ocena:</label>
+                  <select id="rating" class="custom-select" v-model.number="editReviewForm.rating">
+                    <option :value="5">5</option>
+                    <option :value="4">4</option>
+                    <option :value="3">3</option>
+                    <option :value="2">2</option>
+                    <option :value="1">1</option>
+                  </select>
+
+                  <p v-for="value in editReviewForm.rating" :key="value" class="star">★</p>
+                </div>
+                <textarea class="review-textarea" :placeholder="userReview?.content || 'Napisz swoją opinię...'"
+                  v-model="editReviewForm.content">
+                </textarea>
+
+                <button class="custom-button" @click="editReview">Edytuj opinie</button>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <h2 class="section-name">Opinie wszystkich użytkowników</h2>
+          <div class="reviews-filter">
+            Sortuj według:
+            <select id="rating" class="custom-select" v-model.number="rating" @change="onRatingChange">
+              <option :value="5">5</option>
+              <option :value="4">4</option>
+              <option :value="3">3</option>
+              <option :value="2">2</option>
+              <option :value="1">1</option>
+            </select>
+            <p v-if="rating" v-for="star in rating" :key="star" class="star">★</p>
+            <button class="custom-button" @click="clearFilter">Wyczyść filtr</button>
+          </div>
+          <div v-if="!reviews.reviews.length" class="user-reviews">
+            <h2 class="section-name">Brak opinii</h2>
+          </div>
+          <div class="user-reviews" v-else>
+            <div class="review-item" v-for="review in reviews.reviews" :key="review.id">
+              <div class="review-info">
+                <p class="review-author">{{ review.client_name }}</p>
+                <div class="review-right">
+                  <p class="review-rating"><span v-for="i in review.rating">★</span></p>
+                  <p class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</p>
+                </div>
+              </div>
+              <p class="review-text">{{ review.content }}</p>
+            </div>
+            <div class="pagination">
+              <button class="custom-button" @click="loadReviews(currentPage - 1)"
+                :disabled="currentPage === 1">Poprzednia</button>
+              <span>Strona {{ currentPage }} z {{ lastPage }}</span>
+              <button class="custom-button" @click="loadReviews(currentPage + 1)"
+                :disabled="currentPage === lastPage">Następna</button>
+            </div>
+          </div>
+        </section>
       </section>
-    </section>
 
-    <section class="second-column">
-      <section class="map-container">
-        <div id="leaflet-map" class="map-iframe" v-if="business.location"></div>
+      <section class="second-column">
+        <section class="map-container">
+          <div id="leaflet-map" class="map-iframe" v-if="business.location"></div>
+        </section>
+        <div class="address">
+          <strong>Adres:</strong>
+          <p>{{ business.location }}</p>
+        </div>
+
+        <strong>Godziny otwarcia:</strong>
+        <div class="open-hours">
+          <div>
+            <p class="week-day"
+              v-for="(day, i) in ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']"
+              :key="i" :class="{ 'today': i === todayIndex }">
+              {{ day }}
+            </p>
+          </div>
+          <div v-if="business.opening_hours">
+            <p class="day-hours" v-for="(line, i) in business.opening_hours.split('\n')" :key="i"
+              :class="{ 'today': i === todayIndex }">
+              {{ line }}<br />
+            </p>
+          </div>
+          <div v-else>Brak danych</div>
+        </div>
+
+        <div class="description">
+          <strong>Opis:</strong>
+          <p>{{ business.description || 'Brak opisu' }}</p>
+        </div>
+
+        <div class="social-medias">
+          <strong>Media społecznościowe:</strong>
+          <div class="icons">
+            <div v-if="business.facebook_url">
+              <a :href="business.facebook_url" target="_blank">
+                <i class="fa-brands fa-facebook"></i>
+              </a>
+              <p>Facebook</p>
+            </div>
+            <div v-if="business.instagram_url">
+              <a :href="business.instagram_url" target="_blank">
+                <i class="fa-brands fa-instagram"></i>
+              </a>
+              <p>Instagram</p>
+            </div>
+            <div v-if="business.youtube_url">
+              <a :href="business.youtube_url" target="_blank">
+                <i class="fa-brands fa-youtube"></i>
+              </a>
+              <p>YouTube</p>
+            </div>
+            <div v-if="business.website_url">
+              <a :href="business.website_url" target="_blank">
+                <i class="fa-solid fa-globe"></i>
+              </a>
+              <p>Strona</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="category">
+          <strong>Kategoria:</strong>
+          <p>{{ categoryName }}</p>
+        </div>
+        <section v-if="isOwner && isMyBusinessRoute" class="owner-panel">
+          <strong>Panel właściciela:</strong>
+          <button class="custom-button" @click="editReservations()">Zarządzaj rezerwacjami</button>
+          <button class="custom-button" @click="goToBusinessForm()">Edytuj</button>
+          <button class="custom-button delete-button" @click="deleteBusiness">Usuń</button>
+        </section>
       </section>
-      <div class="address">
-        <strong>Adres:</strong>
-        <p>{{ business.location }}</p>
-      </div>
-
-      <strong>Godziny otwarcia:</strong>
-      <div class="open-hours">
-        <div>
-          <p class="week-day"
-            v-for="(day, i) in ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']"
-            :key="i" :class="{ 'today': i === todayIndex }">
-            {{ day }}
-          </p>
-        </div>
-        <div v-if="business.opening_hours">
-          <p class="day-hours" v-for="(line, i) in business.opening_hours.split('\n')" :key="i"
-            :class="{ 'today': i === todayIndex }">
-            {{ line }}<br />
-          </p>
-        </div>
-        <div v-else>Brak danych</div>
-      </div>
-
-      <div class="description">
-        <strong>Opis:</strong>
-        <p>{{ business.description || 'Brak opisu' }}</p>
-      </div>
-
-      <div class="social-medias">
-        <strong>Media społecznościowe:</strong>
-        <div class="icons">
-          <div v-if="business.facebook_url">
-            <a :href="business.facebook_url" target="_blank">
-              <i class="fa-brands fa-facebook"></i>
-            </a>
-            <p>Facebook</p>
-          </div>
-          <div v-if="business.instagram_url">
-            <a :href="business.instagram_url" target="_blank">
-              <i class="fa-brands fa-instagram"></i>
-            </a>
-            <p>Instagram</p>
-          </div>
-          <div v-if="business.youtube_url">
-            <a :href="business.youtube_url" target="_blank">
-              <i class="fa-brands fa-youtube"></i>
-            </a>
-            <p>YouTube</p>
-          </div>
-          <div v-if="business.website_url">
-            <a :href="business.website_url" target="_blank">
-              <i class="fa-solid fa-globe"></i>
-            </a>
-            <p>Strona</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="category">
-        <strong>Kategoria:</strong>
-        <p>{{ categoryName }}</p>
-      </div>
-      <section v-if="isOwner && isMyBusinessRoute" class="owner-panel">
-        <strong>Panel właściciela:</strong>
-        <button class="custom-button" @click="editReservations()">Zarządzaj rezerwacjami</button>
-        <button class="custom-button" @click="goToBusinessForm()">Edytuj</button>
-        <button class="custom-button delete-button" @click="deleteBusiness">Usuń</button>
-      </section>
-    </section>
+    </div>
   </div>
 </template>
 
@@ -298,8 +301,11 @@ onMounted(async () => {
       await businessStore.fetchBusinessById(router.currentRoute.value.params.id);
     }
     await businessStore.fetchServices();
-    await businessStore.fetchReviews(1);
-    await businessStore.fetchAppointmentsById(router.currentRoute.value.params.id);
+    const initialReviews = await businessStore.fetchReviews(1);
+    if (initialReviews) {
+      currentPage.value = initialReviews.current_page;
+      lastPage.value = initialReviews.last_page;
+    } await businessStore.fetchAppointmentsById(router.currentRoute.value.params.id);
     checkIsOwner();
   } catch (err) {
     console.error('Błąd podczas ładowania usługi:', err);
@@ -478,11 +484,16 @@ watch(() => reviews.value.last_page, (newVal) => {
 });
 
 const loadReviews = async (page = 1) => {
-  if (page < 1 || (lastPage.value && page > lastPage.value)) return;
+  if (lastPage.value && (page < 1 || page > lastPage.value)) {
+    console.warn('Nieprawidłowy numer strony.');
+    return;
+  }
   try {
-    const data = await businessStore.fetchReviews(page);
-    currentPage.value = data.current_page;
-    lastPage.value = data.last_page;
+    const data = await businessStore.fetchReviews(page, rating.value);
+    if (data) {
+      currentPage.value = data.current_page;
+      lastPage.value = data.last_page;
+    }
   } catch (e) {
     console.error('Błąd podczas ładowania opinii:', e);
   }
@@ -1090,7 +1101,7 @@ const categoryName = computed(() => {
   .second-column {
     width: 100%;
     padding-left: 0px;
-    background-color: transparent;
+    background: none;
   }
 
   .map-iframe {

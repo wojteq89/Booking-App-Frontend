@@ -78,9 +78,9 @@ const goToDetails = () => {
 
 .favorite-item {
     display: flex;
-    width: 100%;
+    width: 90%;
     max-width: 800px;
-    height: 220px;
+    height: auto;
     overflow: hidden;
     border-radius: 12px;
     margin-bottom: 25px;

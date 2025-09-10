@@ -16,6 +16,12 @@
                 :class="{ 'active-link': route.path === '/' }">Home</button>
             <button class="navbar-button" @click="goToOffers()"
                 :class="{ 'active-link': route.path === '/browse-page' }">Oferty</button>
+            <button v-if="isLoggedIn" class="navbar-button" @click="goToFavorites()"
+                :class="{ 'active-link': route.path === '/favorites' }">Ulubione</button>
+            <button v-if="isLoggedIn" class="navbar-button" @click="goToHistory()"
+                :class="{ 'active-link': route.path === '/history' }">Rezerwacje</button>
+            <button v-if="isLoggedIn" class="navbar-button" @click="goToMyBusiness()"
+                :class="{ 'active-link': route.path === '/my-business' }">Zarządzaj</button>
             <button v-if="!isLoggedIn" class="profile-button" @click="goToLogin()">Zaloguj się</button>
             <button v-if="isLoggedIn" class="profile-button" @click="goToSettingsPage()">{{ user.first_name }}</button>
         </div>
@@ -26,6 +32,12 @@
                 :class="{ 'active-mobile-link': route.path === '/' }">Home</button>
             <button class="navbar-button" @click="goToOffers()"
                 :class="{ 'active-mobile-link': route.path === '/browse-page' }">Oferty</button>
+            <button v-if="isLoggedIn" class="navbar-button" @click="goToFavorites()"
+                :class="{ 'active-link': route.path === '/favorites' }">Ulubione</button>
+            <button v-if="isLoggedIn" class="navbar-button" @click="goToHistory()"
+                :class="{ 'active-link': route.path === '/history' }">Rezerwacje</button>
+            <button v-if="isLoggedIn" class="navbar-button" @click="goToMyBusiness()"
+                :class="{ 'active-link': route.path === '/my-business' }">Zarządzaj</button>
             <button v-if="!isLoggedIn" class="profile-button" @click="goToLogin()">Zaloguj się</button>
             <button v-if="isLoggedIn" class="profile-button" @click="goToSettingsPage()">{{ user.first_name }}</button>
         </div>
@@ -50,7 +62,7 @@ export default defineComponent({
         const isMobile = ref(false)
 
         const checkScreenSize = () => {
-            isMobile.value = window.innerWidth < 768
+            isMobile.value = window.innerWidth < 950
         }
 
         const handleScroll = () => {
@@ -73,9 +85,21 @@ export default defineComponent({
             router.push('/')
         }
 
-        const goToOffers = () => {
+        function goToOffers() {
             router.push('/browse-page');
         };
+
+        function goToMyBusiness() {
+            router.push('/my-business')
+        }
+
+        function goToFavorites() {
+            router.push('/favorites')
+        }
+
+        function goToHistory() {
+            router.push('/history')
+        }
 
         function goToSettingsPage() {
             router.push('/settings')
@@ -104,7 +128,10 @@ export default defineComponent({
             isMenuOpen,
             toggleMenu,
             isMobile,
-            route
+            route,
+            goToMyBusiness,
+            goToFavorites,
+            goToHistory
         }
     },
 })
@@ -128,7 +155,7 @@ export default defineComponent({
 }
 
 .navbar.scrolled {
-    width: 85%;
+    width: 90%;
     left: 50%;
     top: 20px;
     transform: translateX(-50%);
@@ -144,7 +171,7 @@ export default defineComponent({
     cursor: pointer;
     z-index: 10;
 
-    @media (max-width: 768px) {
+    @media (max-width: 950px) {
         transform: scale(1);
         margin-left: 0;
     }
@@ -217,6 +244,7 @@ export default defineComponent({
 
 .active-link {
     font-weight: bold;
+
     &::after {
         width: 100%;
     }
@@ -273,7 +301,7 @@ export default defineComponent({
     }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 950px) {
     .navbar {
         justify-content: flex-end;
     }
