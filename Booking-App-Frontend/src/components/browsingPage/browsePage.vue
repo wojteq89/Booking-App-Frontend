@@ -179,6 +179,14 @@ onMounted(async () => {
 
 }
 
+.no-results {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 .results-section::-webkit-scrollbar {
   height: 8px;
 }

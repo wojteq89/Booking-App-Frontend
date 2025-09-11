@@ -573,20 +573,24 @@ const categoryName = computed(() => {
 .photo-container {
   position: relative;
   overflow: hidden;
-  box-shadow: 0px 10px 10px 1px $shadow;
+  width: 100%;
   border-radius: 10px;
-  margin: 10px 10px 30px 10px;
 }
 
 .image-slider {
   display: flex;
   transition: transform 0.5s ease;
+  width: 100%;
 }
 
 .business-image {
-  width: 100%;
+  flex: 0 0 100%;
   object-fit: cover;
+  width: 100%;
+  height: 70vh;
+  border-radius: 10px;
 }
+
 
 .photo-nav-btn {
   position: absolute;
@@ -773,6 +777,7 @@ const categoryName = computed(() => {
   align-items: center;
   justify-content: center;
   margin-bottom: 30px;
+  margin-top: 50px;
   gap: 50px;
 }
 

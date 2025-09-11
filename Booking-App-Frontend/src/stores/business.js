@@ -87,7 +87,6 @@ export const useBusinessStore = defineStore('business', {
     },
 
     async fetchAllBusinesses(page = 1, category = '', search = '') {
-      this.isLoading = true;
       try {
         const params = {
           page: page,
@@ -104,8 +103,6 @@ export const useBusinessStore = defineStore('business', {
       } catch (err) {
         showAlert({ icon: 'error', title: 'Wystąpił błąd podczas pobierania usług' });
         throw err;
-      } finally {
-        this.isLoading = false;
       }
     },
 

@@ -10,7 +10,7 @@
       </div>
 
       <div class="image-overlay"></div>
-      <div class="category-tag">{{ businessStore.categories[business.category_id]?.name || 'Inne' }}</div>
+      <div class="category-tag">{{ businessStore.categories[(business.category_id)- 1]?.name || 'Inne' }}</div>
     </div>
 
     <div class="card-content">

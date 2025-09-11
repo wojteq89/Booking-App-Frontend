@@ -66,7 +66,7 @@
     <p>Aby dodać biznes, wypełnij formularz.</p>
   </div>
   <div v-else>
-    <Loader/>
+    <Loader />
   </div>
 </template>
 
@@ -164,6 +164,8 @@ const registerBusiness = async () => {
   data.append('instagram_url', form.instagram_url);
   data.append('youtube_url', form.youtube_url);
   data.append('website_url', form.website_url);
+  console.log('Files to upload:', form.newImages);
+  form.newImages.forEach(file => console.log(file, file instanceof File));
   form.newImages.forEach(file => data.append(`images[]`, file));
   await business.registerBusiness(data);
 };
